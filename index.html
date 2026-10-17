@@ -13,9 +13,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#BFE6FB" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12302D" media="(prefers-color-scheme: dark)">
-<meta name="description" content="Estimated timelines for every BTO and new condo in Singapore, with real, recent site photos from people nearby. No ads, no login.">
+<meta name="description" content="See every BTO and new condo in Singapore go from empty land to blocks, with satellite photos since 2012, estimated timelines and real site photos from people nearby. No ads, no login.">
 <meta property="og:title" content="TOP Already?">
-<meta property="og:description" content="Real site photos from real people, plus estimated timelines for every BTO and new condo in Singapore. No ads, no login.">
+<meta property="og:description" content="See your BTO go from forest to blocks: satellite photos since 2012, real site photos from people nearby, and estimated timelines. No ads, no login.">
 <meta property="og:image" content="https://topalready.github.io/preview-icon.png"><meta property="og:image:type" content="image/png"><meta name="twitter:image" content="https://topalready.github.io/preview-icon.png"><meta property="og:image:width" content="512"><meta property="og:image:height" content="512"><meta property="og:url" content="https://topalready.github.io/"><meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -93,6 +93,7 @@ input:focus-visible,button:focus-visible,a:focus-visible,label:focus-within{outl
 .aslide{width:100%;margin:0;accent-color:var(--crane);height:28px}
 .aticks{position:absolute;left:10px;right:10px;bottom:0;height:16px}
 .aticks span{position:absolute;transform:translateX(-50%);font-size:.7rem;font-weight:600;color:var(--muted)}
+.avid{display:block;width:100%;margin:10px 0 0}
 .acredit{font-size:.72rem;color:var(--muted);margin:6px 0 0}.acredit a{color:inherit}
 @media (prefers-reduced-motion:reduce){.aframe{transition:none}}
 .album{margin:6px 0 4px}
@@ -478,7 +479,7 @@ html[data-ph=night] .bldg.seen .lbl{background:#6B5A2A}
     <div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="text" id="q" placeholder="Search a BTO, condo or postal code" autocomplete="off" aria-label="Search projects"><ul class="sugg" id="sugg"></ul></div>
     <button type="button" id="lightbtn" class="lightbtn" aria-label="Day or night"></button>
   </div>
-  <div class="welcome" id="welcome" hidden><b>Waiting for your BTO or condo?</b><p>Search for your project to see its estimated timeline, any announced delays and real site photos from people nearby. Or drag the map to explore.</p><p class="wsmall">No ads, no login.</p><p class="wsmall"><span aria-hidden="true">📸</span> at the top counts the sites you've photographed.</p><div class="wbtns"><button type="button" id="welcomesearch">Find my project</button><button type="button" id="welcomeok" class="wghost">Explore the map</button></div></div>
+  <div class="welcome" id="welcome" hidden><b>See your BTO go from forest to blocks</b><p>Search for your project and scrub through satellite photos of the exact spot since 2012, plus its estimated timeline, any announced delays and real site photos from people nearby.</p><p class="wsmall">No ads, no login.</p><div class="wbtns"><button type="button" id="welcomesearch">Find my project</button><button type="button" id="welcomeok" class="wghost">Explore the map</button></div></div>
   <div class="toast" id="toast" role="status"></div>
   <div class="nearwrap"><div class="nearhead"><p class="nearlabel" id="nearlabel">Near here</p><button type="button" id="locate" aria-label="See what's around me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Around me</button></div><div id="nearby" role="list"></div></div>
 </section>
@@ -857,6 +858,7 @@ function sourcesHTML(p){
     <dt>Timeline %</dt><dd>Worked out by TOP Already? from the launch date and estimated date. Not an official figure.</dd>
     <dt>Verified milestones</dt><dd>None published for this project.</dd>
     <dt>Site photos</dt><dd>Shared by people near the site. Not checked by ${p.kind==="BTO"?"HDB":"the developer"}.</dd>
+    <dt>Satellite photos</dt><dd>Esri World Imagery Wayback (Esri, Vantor, Earthstar Geographics), loaded live. Dates are when each photo was captured.</dd>
   </dl><p><a href="privacy.html">How the numbers work</a></p></details>`;
 }
 function render(){
@@ -990,6 +992,7 @@ async function loadAerial(p,photosReady){
   const rel=d=>{if(!launch)return"";const m=Math.round((new Date(d)-launch)/2629746e3);if(m<-1){const y=Math.round(-m/12);return m<=-12?`${y} yr${y>1?"s":""} before launch`:`${-m} months before launch`}if(m<=1)return"Around launch";return m>=12?`${(m/12).toFixed(m%12?1:0).replace(".0","")} yrs after launch`:`${m} months after launch`};
   body.innerHTML=`<div class="aview" role="img" aria-label="Satellite photo of the site"><div class="aworld" style="left:calc(50% - ${ox.toFixed(1)}px);top:calc(50% - ${oy.toFixed(1)}px)">${frames.map((f,i)=>f.ground?"":`<div class="aframe" data-f="${i}"${i===frames.length-1?"":' style="opacity:0"'}></div>`).join("")}</div>${frames.map((f,i)=>f.ground?`<div class="aframe aground" data-f="${i}"><img alt="Latest community photo of the site" src="${pub(f.ground)}"></div>`:"").join("")}<span class="apin" aria-hidden="true"></span><div class="acap"><b class="adate"></b><span class="arel"></span></div></div>
    <div class="actl"><button type="button" class="aplay" aria-label="Play through the years">▶</button><div class="atrack"><input type="range" class="aslide" min="0" max="${frames.length-1}" step="1" value="${frames.length-1}" aria-label="Satellite photo date"><div class="aticks">${(()=>{let last=-1;return frames.map(({d,ground},i)=>{const x=i/(frames.length-1)*100,show=i===frames.length-1||last<0||x-last>=14;if(i===frames.length-1&&last>=0&&x-last<14)return"";if(!show)return"";last=x;return `<span style="left:${x.toFixed(2)}%">${ground?"Now":d.slice(0,4)}</span>`}).join("")})()}</div></div></div>
+   <button type="button" class="add avid" data-tl="${esc(p.key)}">🎬 Share timelapse video</button>
    <p class="acredit">Imagery: Esri, Vantor, Earthstar Geographics, via <a href="${WBAPP(p.ll)}" target="_blank" rel="noopener">World Imagery Wayback</a>. Singapore is usually re-photographed every year or two${frames[frames.length-1].ground?", so the last frame is the newest community photo from the album below":", so the newest frame may be months old"}.</p>`;
   const fill=i=>{const f=body.querySelector(`.aframe[data-f="${i}"]`);if(!f||f.dataset.ok||f.classList.contains("aground"))return;f.dataset.ok=1;let h="";for(let dy=0;dy<3;dy++)for(let dx=0;dx<3;dx++)h+=`<img alt="" decoding="async" src="${WB}${frames[i].r}/${Z}/${y0+dy}/${x0+dx}" style="left:${dx*256}px;top:${dy*256}px">`;f.innerHTML=h};
   const sl=body.querySelector(".aslide");
@@ -999,8 +1002,71 @@ async function loadAerial(p,photosReady){
   function stopPlay(){if(APLAY){clearInterval(APLAY);APLAY=null}btn.textContent="▶";btn.setAttribute("aria-label","Play through the years")}
   btn.addEventListener("click",()=>{if(APLAY)return stopPlay();frames.forEach((_,i)=>fill(i));let i=+sl.value>=frames.length-1?0:+sl.value;show(i);btn.textContent="❚❚";btn.setAttribute("aria-label","Pause");APLAY=setInterval(()=>{i++;if(i>=frames.length)return stopPlay();show(i)},1100)});
   show(frames.length-1);
+  box._tl={p,frames,x0,y0,ox,oy,label,rel};
   setTimeout(()=>frames.forEach((_,i)=>fill(i)),1500);
 }
+
+/* ---------- Timelapse video: draws the satellite frames onto a 9:16 canvas and records it ---------- */
+const loadImg=src=>new Promise(res=>{const im=new Image();im.crossOrigin="anonymous";im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src});
+function vidType(){if(!window.MediaRecorder)return null;for(const t of ["video/mp4;codecs=avc1","video/mp4","video/webm;codecs=vp9","video/webm"])if(MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))return t;return null}
+async function makeTimelapse(btn){
+  const box=btn.closest(".aerial"),T=box&&box._tl;if(!T)return;
+  const type=vidType();if(!type)return toast("This browser can't make videos. Try Chrome, or Safari on a recent iPhone.");
+  const old=btn.textContent;btn.disabled=true;btn.textContent="Loading satellite photos…";
+  try{
+    const {p,frames,x0,y0,ox,oy,label,rel}=T,Z=18;
+    await document.fonts.ready;
+    const imgs=await Promise.all(frames.map(async f=>{
+      if(f.ground)return {ground:await loadImg(pub(f.ground))};
+      const c=document.createElement("canvas");c.width=c.height=768;const g=c.getContext("2d");
+      const tiles=await Promise.all([0,1,2].flatMap(dy=>[0,1,2].map(dx=>loadImg(`${WB}${f.r}/${Z}/${y0+dy}/${x0+dx}`).then(im=>({im,dx,dy})))));
+      let ok=0;for(const t of tiles)if(t.im){g.drawImage(t.im,t.dx*256,t.dy*256);ok++}
+      return ok?{sat:c}:null}));
+    const F=frames.map((f,i)=>({...f,img:imgs[i]})).filter(f=>f.img&&(f.img.sat||f.img.ground));
+    if(F.length<2)throw new Error("few");
+    btn.textContent="Making your video…";
+    const W=720,H=1280,cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");
+    const name=p.name.replace(/\s*\(.*?\)/,""),IMG=624,IX=(W-IMG)/2,IY=262,CROP=430;
+    const HOLD=1100,FADE=450,END=2200,total=F.length*HOLD+(F.length-1)*0+END;
+    const wrap=(t,max,font)=>{g.font=font;const w=t.split(" "),L=[];let c="";for(const x of w){const tt=(c+" "+x).trim();if(g.measureText(tt).width>max&&c){L.push(c);c=x}else c=tt}L.push(c);return L};
+    const drawFrame=(f,a)=>{if(!f)return;g.save();g.globalAlpha=a;g.beginPath();g.roundRect(IX,IY,IMG,IMG,36);g.clip();
+      if(f.img.sat){g.drawImage(f.img.sat,ox-CROP/2,oy-CROP/2,CROP,CROP,IX,IY,IMG,IMG);g.lineWidth=7;g.strokeStyle="#FFD36E";g.beginPath();g.arc(W/2,IY+IMG/2,46,0,7);g.stroke()}
+      else{const im=f.img.ground,s=Math.max(IMG/im.width,IMG/im.height),w=im.width*s,h=im.height*s;g.drawImage(im,IX+(IMG-w)/2,IY+(IMG-h)/2,w,h)}
+      g.restore()};
+    const draw=t=>{
+      g.fillStyle="#FFF8EC";g.fillRect(0,0,W,H);
+      g.fillStyle="#3A2C26";g.textAlign="center";
+      g.font="600 30px Figtree, sans-serif";g.fillStyle="#9A7B5F";g.fillText(p.kind==="BTO"?"BTO PROJECT":"NEW CONDO",W/2,92);
+      const lines=wrap(name,W-100,"600 62px Fraunces, Georgia, serif");g.fillStyle="#3A2C26";lines.slice(0,2).forEach((l,i)=>g.fillText(l,W/2,(lines.length>1?160:190)+i*66));
+      const i=Math.min(F.length-1,Math.floor(t/HOLD)),into=t-i*HOLD,ending=t>=F.length*HOLD;
+      g.fillStyle="#2B3A33";g.beginPath();g.roundRect(IX,IY,IMG,IMG,36);g.fill();
+      if(!ending&&i>0&&into<FADE){drawFrame(F[i-1],1);drawFrame(F[i],into/FADE)}else drawFrame(F[ending?F.length-1:i],1);
+      const cur=F[ending?F.length-1:i];
+      g.fillStyle="#3A2C26";g.font="600 76px Fraunces, Georgia, serif";g.fillText(label(cur.d),W/2,IY+IMG+92);
+      g.font="500 32px Figtree, sans-serif";g.fillStyle="#7A6658";g.fillText(cur.ground?"From the ground":(rel(cur.d)||"Satellite photo"),W/2,IY+IMG+136);
+      const bx=80,bw=W-160,by=IY+IMG+168,prog=Math.min(1,t/(F.length*HOLD-HOLD+1));
+      g.fillStyle="#EFE3CF";g.beginPath();g.roundRect(bx,by,bw,12,6);g.fill();g.fillStyle="#F2B33D";g.beginPath();g.roundRect(bx,by,Math.max(12,bw*prog),12,6);g.fill();
+      g.font="600 24px Figtree, sans-serif";g.fillStyle="#9A7B5F";g.textAlign="left";g.fillText(F[0].d.slice(0,4),bx,by+44);g.textAlign="right";g.fillText(F[F.length-1].ground?"Now":F[F.length-1].d.slice(0,4),bx+bw,by+44);g.textAlign="center";
+      if(ending){const a=Math.min(1,(t-F.length*HOLD)/400);g.globalAlpha=a;g.fillStyle="#3A2C26";g.beginPath();g.roundRect(60,H-178,W-120,104,28);g.fill();g.fillStyle="#FFF8EC";g.font="600 32px Fraunces, Georgia, serif";g.fillText("Track yours on",W/2,H-136);g.font="600 32px Figtree, sans-serif";g.fillStyle="#FFD36E";g.fillText("topalready.github.io",W/2,H-96);g.globalAlpha=1}
+      else{g.font="600 30px Figtree, sans-serif";g.fillStyle="#3A2C26";g.fillText("topalready.github.io",W/2,H-112)}
+      g.font="500 20px Figtree, sans-serif";g.fillStyle="#9A8B7E";g.fillText("Satellite: Esri, Vantor, Earthstar Geographics (World Imagery Wayback)",W/2,H-42);
+      if(F.some(f=>f.ground))g.fillText("Ground photo: shared by a TOP Already? user",W/2,H-16);
+    };
+    draw(0);
+    const stream=cv.captureStream(30),rec=new MediaRecorder(stream,{mimeType:type,videoBitsPerSecond:4e6}),chunks=[];
+    rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+    const done=new Promise(r=>rec.onstop=r);
+    rec.start(250);const t0=performance.now();
+    await new Promise(res=>{const tick=()=>{const t=performance.now()-t0;draw(Math.min(t,total));if(t<total)requestAnimationFrame(tick);else res()};requestAnimationFrame(tick)});
+    rec.stop();await done;
+    const ext=type.includes("mp4")?"mp4":"webm",blob=new Blob(chunks,{type:type.split(";")[0]}),file=new File([blob],`${slug(p.name)}-timelapse.${ext}`,{type:blob.type});
+    track("share",p.key);
+    if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:name+" timelapse",text:`${name}, from above: ${pageUrl(p)}`});return}catch(e){if(e&&e.name==="AbortError")return}}
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=file.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),6e4);toast("Video saved");
+  }catch(e){toast(e&&e.message==="few"?"Couldn't load enough satellite photos. Try again in a moment.":"Couldn't make the video this time. Please try again.")}
+  finally{btn.disabled=false;btn.textContent=old}
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-tl]");if(b)makeTimelapse(b)});
 /* ---------- Photos: EXIF (date + GPS) ---------- */
 function readExif(buf){
   const v=new DataView(buf);
