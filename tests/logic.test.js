@@ -52,6 +52,14 @@ t("first visit lands on the busiest cluster", () => {
   assert.deepStrictEqual(busiest().ll.slice(0, 1), [1.30]);
 });
 t("map sprites and sheet art never draw a finished building from dates alone", () => {
-  assert.ok((html.match(/done=false/g) || []).length >= 2);
+  assert.ok(html.includes("done=!!isDone") && html.includes("done=!!p.done"));
+  assert.ok(!stats(bto(ymOff(-50), ymOff(-1))).done);
+});
+t("only a verified override marks a project complete", () => {
+  const p = { ...bto(ymOff(-30), ymOff(18)), kind: "Condo", done: { top: ymOff(-1), keys: ymOff(0), how: "owners" } };
+  const k = stats(p), v = verdict(p, k);
+  assert.ok(k.done && k.pct === 100);
+  assert.match(v.t, /TOP obtained/);
+  assert.match(v.d, /owners/);
 });
 console.log(`\n${n} checks passed`);

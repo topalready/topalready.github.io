@@ -93,6 +93,8 @@ input:focus-visible,button:focus-visible,a:focus-visible,label:focus-within{outl
 .aslide{width:100%;margin:0;accent-color:var(--crane);height:28px}
 .aticks{position:absolute;left:10px;right:10px;bottom:0;height:16px}
 .aticks span{position:absolute;transform:translateX(-50%);font-size:.7rem;font-weight:600;color:var(--muted)}
+.explain a{color:inherit}
+.fixline{margin:12px 0 0;font-size:.85rem;color:var(--muted);text-align:center}.fixline a{color:var(--ink);font-weight:600}
 .avid{display:block;width:100%;margin:10px 0 0}
 .acredit{font-size:.72rem;color:var(--muted);margin:6px 0 0}.acredit a{color:inherit}
 @media (prefers-reduced-motion:reduce){.aframe{transition:none}}
@@ -640,24 +642,26 @@ function search(q){
 /* ---------- Progress ---------- */
 function stats(p){
   const L=ym(p.launch),E=ym(p.ecd),T=ym(p.delayed||p.ecd),now=new Date();
+  if(p.done)return{L,E,T:ym(p.done.top)||T,pct:100,rate:null,left:0,delay:0,done:true};
   if(!L)return{L,E,T,pct:null,rate:null,left:T?Math.max(0,Math.round(months(now,T))):null,delay:0};
   const total=months(L,T);
   return{L,E,T,pct:Math.max(0,Math.min(100,months(L,now)/total*100)),rate:100/total,left:Math.max(0,Math.round(months(now,T))),delay:p.delayed?Math.round(months(E,T)):0};
 }
 function stageFor(p){return p==null?"Not launched":p<12?"Piling and foundations":p<70?"Structure going up":p<92?"Facade and fit-out":p<100?"Final works":"Estimated date reached"}
 const PCT_WORDS="of estimated timeline elapsed";
-const pctShort=k=>k.pct==null?"Not launched":Math.round(k.pct)+"%";
+const pctShort=k=>k.done?"TOP ✓":k.pct==null?"Not launched":Math.round(k.pct)+"%";
 const dateLabel=p=>p.kind==="BTO"?"Est. completion":"Expected TOP";
 const srcName=p=>p.kind==="BTO"?"HDB's estimate":"the developer's estimate";
 let DATAINFO={updated:"",checked:{}};
 function verdict(p,k){
+  if(k.done){const o=p.done;return{cls:"ahead",t:"TOP obtained",d:`TOP reported in ${fmtYM(ym(o.top))}${o.keys?`, with key collection from ${fmtYM(ym(o.keys))}`:""}. Based on ${o.how||"reports"}${o.src?"":""}. ${p.kind==="BTO"?"HDB's":"The developer's"} listing still showed ${fmtYM(k.E)}, which is often the latest allowed date.`}}
   if(k.pct==null)return{cls:"",t:"Not launched yet",d:`${dateLabel(p)} ${fmtYM(k.T)}. The timeline starts once it launches.`};
   if(k.pct>=100)return{cls:"",t:"Estimated date reached",d:`${p.kind==="BTO"?"HDB's estimated completion date":"The developer's expected TOP date"} (${fmtYM(k.T)}) has arrived. We have no confirmation that it is complete or that keys are being handed over. Check with ${p.kind==="BTO"?"HDB":"the developer"}.`};
   if(k.delay>=1){
     const why=p.remark?p.remark.replace(/\s*\d{4}-\d{2}-\d{2}$/,"").replace("Covid19:","Covid-19:").replace(/month(s)?\(s\)/,"months")+".":"";
     return{cls:"behind",t:`Delay announced: about ${k.delay} months`,d:`Launched with completion estimated for ${fmtYM(k.E)}, now ${fmtYM(k.T)}. ${why}`};
   }
-  return{cls:"ahead",t:"No delay announced",d:p.kind==="BTO"?`HDB still estimates completion in ${fmtYM(k.T)}.`:`Developer's expected TOP is ${fmtYM(k.T)}. Developers don't always announce delays.`};
+  return{cls:"ahead",t:"No delay announced",d:p.kind==="BTO"?`HDB still estimates completion in ${fmtYM(k.T)}.`:`Developer's expected TOP is ${fmtYM(k.T)}. Listed dates are often the latest allowed, so many condos finish earlier, and developers don't always announce delays.`};
 }
 
 /* ---------- Illustration ---------- */
@@ -670,10 +674,10 @@ function mix(a,b,t){const p=h=>(h.length==4&&(h="#"+h[1]+h[1]+h[2]+h[2]+h[3]+h[3
 const FACADES=[["#F4C6B0","#D9A08A","#E58F73"],["#CDE3C6","#A3C39C","#6FA374"],["#F5E1A6","#D8BD7B","#D9A23F"],["#CCE2F2","#9FC0DA","#5E95C4"],["#F1CFD9","#D3A3B4","#C9738F"],["#EEE5D5","#CFBEA2","#B48E62"]];
 function tint(c,ph){return ph==="night"?mix(c,"#232A57",.62):ph==="golden"?mix(c,"#FF9E66",.16):c}
 function rnd(s){const x=Math.sin(hash(s)%100000+1)*43758.5453;return x-Math.floor(x)}
-function building(pct,name){
+function building(pct,name,isDone){
   pct=pct||0;const ph=phase(),NI=ph==="night",GO=ph==="golden";
   const W=360,H=290,G=246,N=16,fh=11,fx=112,fw=112,dx=40,dy=-20,top=G-N*fh;
-  const built=pct>0?Math.max(1,Math.round(N*Math.min(pct,100)/100)):0,done=false,yb=G-built*fh; // dates alone never prove completion
+  const built=pct>0?Math.max(1,Math.round(N*Math.min(pct,100)/100)):0,done=!!isDone,yb=G-built*fh; // dates alone never prove completion; only a verified override does
   const F=FACADES[hash(name)%FACADES.length],cf=tint(F[0],ph),cs=tint(F[1],ph),ca=tint(F[2],ph);
   const u="b"+hash(name+ph)%99999;
   const sky=NI?["#151A44","#2C2C66","#5B4A85"]:GO?["#E99A86","#F6C49A","#FCE3BC"]:["#8CCDF0","#C2E5F6","#EEF7EE"];
@@ -815,20 +819,20 @@ function card(p){
   let where=p.kind==="BTO"?(p.blks.length?"Blk "+p.blks.slice().sort((a,b)=>parseInt(a)-parseInt(b)||a.localeCompare(b)).join(", ")+", "+p.roads.map(title).join(" / "):"Block numbers not on OneMap yet"):(p.addr||"Address not listed");
   if(where.length>140)where=where.slice(0,137)+"…";
   return `<section class="site" data-key="${esc(p.key)}" id="c-${id}">
-  <div class="scene" data-pct="${k.pct||0}">${building(k.pct,p.name)}<span class="artnote">Illustration of the estimated timeline</span></div>
+  <div class="scene" data-pct="${k.pct||0}">${building(k.pct,p.name,k.done)}<span class="artnote">${k.done?"Illustration: TOP reported":"Illustration of the estimated timeline"}</span></div>
   <div class="body">
     <h2>${esc(p.name)}<span class="tag ${p.kind}">${p.kind}</span></h2><p class="addr">${esc(where)}</p>
-    <div class="storey"><span class="num">${k.pct==null?"—":Math.round(k.pct)+"%"}</span><span>${k.pct==null?"timeline starts at launch":PCT_WORDS}</span></div>
+    <div class="storey"><span class="num">${k.done?"TOP":k.pct==null?"—":Math.round(k.pct)+"%"}</span><span>${k.done?"obtained, "+fmtYM(k.T):k.pct==null?"timeline starts at launch":PCT_WORDS}</span></div>
     <div class="bar"><i style="width:${k.pct||0}%"></i></div>
-    <p class="explain">Time since launch, as a share of the time to ${srcName(p)} of completion. It doesn't measure work on site.</p>
+    <p class="explain">${k.done?`Marked complete from ${esc(p.done.how||"reports")}${p.done.src?` (<a href="${esc(p.done.src)}" target="_blank" rel="noopener">source</a>)`:""}.`:`Time since launch, as a share of the time to ${srcName(p)} of completion. It doesn't measure work on site.`}</p>
     <div class="built" data-built="${esc(p.key)}">${builtHTML(p)}</div>
     <div class="verdict ${v.cls}"><b>${esc(v.t)}</b>${esc(v.d)}</div>
     ${p.ll?`<div class="aerial" data-aerial="${esc(p.key)}"><h3>From above</h3><p class="note">Satellite photos of this exact spot over the years. Drag back to see it before construction.</p><div class="abody"><p class="note">Loading satellite photos…</p></div></div>`:""}
     <div class="facts">
       <div>Launched<b>${fmtYM(k.L)}</b></div>
-      <div>${dateLabel(p)}<b>${fmtYM(k.T)}</b></div>
-      <div>Until that date<b>${k.pct==null?"—":k.pct>=100?"Date passed":k.left?"~"+k.left+" months":"Under a month"}</b></div>
-      <div>Typical stage by now<b>${stageFor(k.pct)}</b><small>General guide, not verified</small></div>
+      <div>${k.done?"TOP obtained":dateLabel(p)}<b>${fmtYM(k.T)}</b></div>
+      <div>Until that date<b>${k.done?"Done":k.pct==null?"—":k.pct>=100?"Date passed":k.left?"~"+k.left+" months":"Under a month"}</b></div>
+      <div>Typical stage by now<b>${k.done?"Completed":stageFor(k.pct)}</b><small>${k.done?"TOP reported, see above":"General guide, not verified"}</small></div>
     </div>
     <button type="button" class="add sharebtn" data-share="${esc(p.key)}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Share progress card</button>
     ${sourcesHTML(p)}
@@ -846,6 +850,7 @@ function card(p){
       <button class="ghost" type="button" data-copy="${p.i}">Copy link</button>
       <button class="ghost" type="button" data-watch-toggle="${p.i}">${tracked.includes(p.key)?"Stop watching":"Watch this"}</button>
     </div>
+    <p class="fixline">Got your keys, or spotted something wrong? <a href="mailto:topalready.sg@gmail.com?subject=${encodeURIComponent("Update: "+p.name)}&body=${encodeURIComponent("Project: "+p.name+" ("+p.kind+")\nWhat's changed or wrong:\n\nHow you know (e.g. collected keys, letter from developer, news link):\n")}">Tell us</a></p>
     ${tipHTML(false)}
   </div></section>`;
 }
@@ -1197,7 +1202,7 @@ async function makeCard(p){
   c.fillStyle="#FFFDF7";rrect(c,px,py,pw,ph,56);c.fill();c.lineWidth=3;c.strokeStyle=ink;c.stroke();
   // illustration
   const IH=780-82*(lines2(p.name,"600 72px Fraunces, Georgia, serif")-1)-64*(lines2(v.t,"600 54px Fraunces, Georgia, serif")-1);c.save();rrect(c,px+4,py+4,pw-8,IH,52);c.clip();
-  const art=await svgImage(building(k.pct,p.name),720,0);const sc=Math.max(pw/art.width,IH/art.height),aw=art.width*sc,ah=art.height*sc;
+  const art=await svgImage(building(k.pct,p.name,k.done),720,0);const sc=Math.max(pw/art.width,IH/art.height),aw=art.width*sc,ah=art.height*sc;
   c.drawImage(art,px+(pw-aw)/2,py+IH-ah,aw,ah);c.restore();
   c.beginPath();c.moveTo(px,py+IH);c.lineTo(px+pw,py+IH);c.lineWidth=3;c.strokeStyle=ink;c.stroke();
   // name + tag
@@ -1257,7 +1262,7 @@ $("#sharebox").addEventListener("click",e=>{if(e.target.id==="sharebox")$("#shar
 
 const FOUND_KEY="storeys.found.v1";
 function bldgSvg(p){
-  const k=stats(p),pct=k.pct||0,N=7,fh=7,fx=12,fw=24,dx=12,dy=-6,G=64,built=Math.max(1,Math.round(N*Math.min(pct,100)/100)),done=false,yb=G-built*fh;
+  const k=stats(p),pct=k.pct||0,N=7,fh=7,fx=12,fw=24,dx=12,dy=-6,G=64,built=Math.max(1,Math.round(N*Math.min(pct,100)/100)),done=!!p.done,yb=G-built*fh;
   const F=FACADES[hash(p.name)%FACADES.length];
   let g=`<ellipse cx="30" cy="65" rx="22" ry="4.5" fill="rgba(43,36,32,.22)"/>`;
   g+=`<g fill="none" stroke="#3A2C26" stroke-opacity=".28" stroke-dasharray="2 2"><rect x="${fx}" y="${G-N*fh}" width="${fw}" height="${N*fh}"/><path d="M${fx+fw} ${G-N*fh}l${dx} ${dy}V${G+dy}"/></g>`;
@@ -1411,7 +1416,7 @@ function applyLight(force){
   document.documentElement.dataset.ph=ph;
   const b=$("#lightbtn");if(b){b.innerHTML=LIGHT_ICON[ph];b.classList.toggle("auto",LIGHT==="auto");b.setAttribute("aria-label",`Lighting: ${LIGHT==="auto"?"follows Singapore time, now "+ph:ph}. Tap to change.`)}
   if(MAP&&(changed||force))MAP.setStyle(worldStyle(ph),{diff:true});
-  if(changed||force)document.querySelectorAll("#sheet .scene:not(.photo)").forEach(sc=>{const p=P.find(q=>q.key===SHEETKEY);if(p)sc.innerHTML=building(stats(p).pct,p.name)});
+  if(changed||force)document.querySelectorAll("#sheet .scene:not(.photo)").forEach(sc=>{const p=P.find(q=>q.key===SHEETKEY);if(p)sc.innerHTML=building(stats(p).pct,p.name,!!p.done)});
 }
 function hideWelcome(){const w=$("#welcome");if(!w||w.hidden)return;w.hidden=true;try{localStorage.setItem("storeys.welcomed","1")}catch(e){}}
 $("#welcomeok").addEventListener("click",hideWelcome);$("#welcomesearch").addEventListener("click",()=>{hideWelcome();$("#q").focus()});$("#q").addEventListener("focus",hideWelcome);
@@ -1510,11 +1515,12 @@ q.addEventListener("keydown",e=>{if(e.key==="Enter"){const b=sug.querySelector("
 sug.addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b)choose(+b.dataset.i)});
 
 /* ---------- Load data ---------- */
-fetch("data.json?"+Date.now()).then(r=>r.json()).then(D=>{
+let OVR={};const ovrReady=fetch("overrides.json?"+Date.now()).then(r=>r.ok?r.json():{}).then(o=>OVR=o||{}).catch(()=>{});
+fetch("data.json?"+Date.now()).then(r=>r.json()).then(async D=>{await ovrReady;
   DATAINFO={updated:D.updated||"",checked:D.checked||{}};$("#upd").textContent=D.updated;
   D.bto.forEach(r=>P.push({kind:"BTO",name:r[0],launch:r[2],ecd:r[3],delayed:r[4],remark:r[5],roads:r[6]?r[6].split("|"):[],blks:r[7]?r[7].split(" "):[],postals:r[8]?r[8].split(" "):[],ll:r[9]||null,addr:""}));
   D.condo.forEach(r=>P.push({kind:"Condo",name:r[0],launch:r[1],ecd:r[2],delayed:"",remark:"",roads:[],blks:[],postals:(r[3].match(/\b\d{6}\b/g)||[]),addr:r[3],ll:r[4]||null}));
-  P.forEach((p,i)=>{p.i=i;p.key=p.kind+":"+p.name+":"+p.launch;p.nn=norm(p.name);p.na=norm(p.addr+" "+p.roads.join(" "))});
+  P.forEach((p,i)=>{p.i=i;p.key=p.kind+":"+p.name+":"+p.launch;p.done=OVR[p.kind+":"+p.name]||null;p.nn=norm(p.name);p.na=norm(p.addr+" "+p.roads.join(" "))});
   render();explore();badge();initMap();applyLight(false);loadFeed();loadStatus();$("#tipslot").innerHTML=tipHTML(true);
   try{if(!sessionStorage.getItem("storeys.v")){sessionStorage.setItem("storeys.v","1");track("visit")}}catch(e){track("visit")}
   const want=new URLSearchParams(location.search).get("p"),wp=want&&P.find(q=>slug(q.name)===want);

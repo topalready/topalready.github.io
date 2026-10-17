@@ -27,6 +27,10 @@ def fmt(d):
 
 today = (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=8)).date()
 d = json.load(open(os.path.join(ROOT, "data.json")))
+try:
+    OVR = json.load(open(os.path.join(ROOT, "overrides.json")))
+except Exception:
+    OVR = {}
 rows = [("BTO", r[0], r[2], r[3], r[4]) for r in d["bto"]] + [("Condo", r[0], r[1], r[2], "") for r in d["condo"]]
 
 made = 0
@@ -39,6 +43,10 @@ for kind, name, launch, ecd, delayed in rows:
         desc = f"{pct}% of the estimated timeline has elapsed (a time-based estimate, not measured progress). {'Est. completion' if kind == 'BTO' else 'Expected TOP'}: {fmt(T)}. Satellite photos since 2012 and real site photos from people nearby. No ads."
     else:
         desc = f"Expected {'completion' if kind == 'BTO' else 'TOP'}: {fmt(T)}. Satellite photos since 2012 and real site photos from people nearby. No ads."
+    done = OVR.get(f"{kind}:{name}")
+    if done:
+        T, pct = ym(done["top"]), 100
+        desc = f"TOP obtained: reported {fmt(T)}" + (f", key collection from {fmt(ym(done['keys']))}" if done.get("keys") else "") + ". Satellite photos since 2012 and real site photos from people nearby. No ads."
     title = f"{name} ({kind}) · {APP}"
     url = f"{SITE}p/{s}/"
     e = html.escape
@@ -46,7 +54,7 @@ for kind, name, launch, ecd, delayed in rows:
     img = f"{SITE}icon-512.png"
     if card:
         try:
-            card(os.path.join(ROOT, "p", s, "card.png"), name, kind, pct, f"{'Est. completion' if kind == 'BTO' else 'Expected TOP'}: {fmt(T)}")
+            card(os.path.join(ROOT, "p", s, "card.png"), name, kind, pct, f"TOP obtained: {fmt(T)}" if done else f"{'Est. completion' if kind == 'BTO' else 'Expected TOP'}: {fmt(T)}", done=done or False)
             img = f"{url}card.png"
         except Exception as e:
             print("card failed", name, e)

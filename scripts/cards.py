@@ -50,7 +50,7 @@ def dashed(d, pts, fill, dash=8, gap=7, width=2):
             a, b = i * (dash + gap) / L, min(1, (i * (dash + gap) + dash) / L)
             d.line([(x1 + (x2 - x1) * a, y1 + (y2 - y1) * a), (x1 + (x2 - x1) * b, y1 + (y2 - y1) * b)], fill=fill, width=width)
 
-def card(path, name, kind, pct, when_label):
+def card(path, name, kind, pct, when_label, done=False):
     W, H, S = 1200, 630, 2  # draw at 2x then downsample for smooth edges
     im = Image.new("RGB", (W * S, H * S))
     d = ImageDraw.Draw(im)
@@ -72,7 +72,7 @@ def card(path, name, kind, pct, when_label):
     cf, cs, ca = rgb(F[0]), rgb(F[1]), rgb(F[2])
     N, fh, fx, fw, dx, dy = 16, 24, 840, 180, 70, -35
     built = max(1, round(N * min(pct or 0, 100) / 100)) if pct else 0
-    done = False  # dates alone never prove a building is finished
+    # dates alone never prove a building is finished; only a verified override sets done
     topy = G - N * fh
     ghost = mix(INK, bot, .6)
     dashed(d, [(s(fx), s(G)), (s(fx), s(topy)), (s(fx + fw), s(topy)), (s(fx + fw), s(G))], ghost)
@@ -140,17 +140,17 @@ def card(path, name, kind, pct, when_label):
         y += round(size * 1.14)
     y += 8
     if pct is not None:
-        big = f"{round(pct)}%"
+        big = "TOP" if done else f"{round(pct)}%"
         d.text((s(x - 4), s(y - 10)), big, font=fBig, fill=INK)
         bw = d.textlength(big, font=fBig) / S
-        d.text((s(x + bw + 16), s(y + 38)), "of estimated", font=fTxt, fill=MUTED)
-        d.text((s(x + bw + 16), s(y + 72)), "timeline elapsed", font=fTxt, fill=MUTED)
+        d.text((s(x + bw + 16), s(y + 38)), "obtained" if done else "of estimated", font=fTxt, fill=MUTED)
+        d.text((s(x + bw + 16), s(y + 72)), "(reported)" if done else "timeline elapsed", font=fTxt, fill=MUTED)
         y += 132
         d.rounded_rectangle([s(x), s(y), s(620), s(y + 18)], radius=s(9), fill=rgb("#EFE7DA"))
         d.rounded_rectangle([s(x), s(y), s(x + max(18, (620 - x) * min(pct, 100) / 100)), s(y + 18)], radius=s(9), fill=rgb("#62C07A"))
         y += 40
     d.text((s(x), s(y)), when_label, font=fTxt, fill=MUTED)
-    d.text((s(x), s(y + 40)), "Time-based estimate, not measured progress", font=font("Figtree-Medium.ttf", s(21)), fill=MUTED)
+    d.text((s(x), s(y + 40)), ("Reported by " + (done.get("how", "owners") if isinstance(done, dict) else "owners")) if done else "Time-based estimate, not measured progress", font=font("Figtree-Medium.ttf", s(21)), fill=MUTED)
     d.text((s(x), s(528)), "TOP Already?", font=fSmall, fill=INK)
     d.text((s(x) + d.textlength("TOP Already?  ", font=fSmall), s(528)), "topalready.github.io", font=font("Figtree-Medium.ttf", s(22)), fill=MUTED)
     im = im.resize((W, H), Image.LANCZOS)
