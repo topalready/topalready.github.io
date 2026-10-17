@@ -75,7 +75,7 @@ input:focus-visible,button:focus-visible,a:focus-visible,label:focus-within{outl
 .note{font-size:.88rem;color:var(--muted);margin:0}
 .photos{border-top:3px dashed color-mix(in srgb,var(--edge) 30%,transparent);margin-top:18px;padding-top:16px}
 .photos h3{font-size:1.2rem;margin:0 0 4px}
-.aerial{border-top:3px dashed color-mix(in srgb,var(--edge) 30%,transparent);margin-top:18px;padding-top:16px}
+.aerial{margin:18px 0 16px}
 .aerial h3{font-size:1.2rem;margin:0 0 4px}
 .aview{position:relative;aspect-ratio:1;border-radius:18px;overflow:hidden;background:#2B3A33;margin-top:8px}
 .aworld{position:absolute;width:768px;height:768px}
@@ -820,6 +820,7 @@ function card(p){
     <p class="explain">Time since launch, as a share of the time to ${srcName(p)} of completion. It doesn't measure work on site.</p>
     <div class="built" data-built="${esc(p.key)}">${builtHTML(p)}</div>
     <div class="verdict ${v.cls}"><b>${esc(v.t)}</b>${esc(v.d)}</div>
+    ${p.ll?`<div class="aerial" data-aerial="${esc(p.key)}"><h3>From above</h3><p class="note">Satellite photos of this exact spot over the years. Drag back to see it before construction.</p><div class="abody"><p class="note">Loading satellite photos…</p></div></div>`:""}
     <div class="facts">
       <div>Launched<b>${fmtYM(k.L)}</b></div>
       <div>${dateLabel(p)}<b>${fmtYM(k.T)}</b></div>
@@ -837,7 +838,6 @@ function card(p){
       <p class="note howto">You need to be within 800 m of the site, using a photo from the last 14 days. We read the location saved in the photo, or ask for yours if there isn't one. Your exact location isn't stored. Photos appear for everyone straight away and can be reported. Shoot the building, not faces or homes. <a href="privacy.html">Photo rules</a></p>`:`<p class="note">Photo uploads open once this site is on the map.</p>`}
       <p class="status" role="status"></p>
     </div>
-    ${p.ll?`<div class="aerial" data-aerial="${esc(p.key)}"><h3>From above</h3><p class="note">Satellite photos of this exact spot over the years. Drag back to see it before construction.</p><div class="abody"><p class="note">Loading satellite photos…</p></div></div>`:""}
     <div class="row">
       ${p.ll?`<button class="maplink" type="button" data-fly="${p.i}">Fly there on the map</button>`:""}
       <button class="ghost" type="button" data-copy="${p.i}">Copy link</button>
