@@ -81,6 +81,8 @@ input:focus-visible,button:focus-visible,a:focus-visible,label:focus-within{outl
 .aworld{position:absolute;width:768px;height:768px}
 .aframe{position:absolute;inset:0;transition:opacity .45s ease}
 .aframe img{position:absolute;width:256px;height:256px;display:block}
+.aground{background:#000}.aground img{position:static;width:100%;height:100%;object-fit:cover}
+.aview.isground .apin{display:none}
 .apin{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid #FFD36E;box-shadow:0 0 0 2px rgba(0,0,0,.35),inset 0 0 0 2px rgba(0,0,0,.25);pointer-events:none}
 .acap{position:absolute;left:10px;top:10px;padding:6px 12px;border-radius:12px;background:rgba(30,24,20,.72);color:#fff;font-size:.78rem}
 .acap b{display:block;font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:1.15rem}
@@ -970,24 +972,28 @@ $("#cheer").addEventListener("click",e=>{if(e.target.id==="cheer")$("#cheer").hi
 let AERIAL=null,APLAY=null;
 const WB="https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/";
 const WBAPP=ll=>`https://livingatlas.arcgis.com/wayback/#mapCenter=${ll[1].toFixed(5)}%2C${ll[0].toFixed(5)}%2C17&mode=explore`;
-async function loadAerial(p){
+async function loadAerial(p,photosReady){
   if(!p.ll)return;
+  try{await photosReady}catch(e){}
   if(!AERIAL){try{const r=await fetch("aerial.json",{cache:"no-cache"});AERIAL=r.ok?await r.json():{sites:{}}}catch(e){AERIAL={sites:{}}}}
   const box=[...document.querySelectorAll(".aerial")].find(b=>b.dataset.aerial===p.key);if(!box)return;
-  const frames=(AERIAL.sites[p.ll[0].toFixed(4)+","+p.ll[1].toFixed(4)]||[]).slice().reverse(); // oldest first
+  const sat=(AERIAL.sites[p.ll[0].toFixed(4)+","+p.ll[1].toFixed(4)]||[]).slice().reverse(); // oldest first
   const body=box.querySelector(".abody");
-  if(frames.length<2){body.innerHTML=`<p class="note">No satellite history for this spot yet. <a href="${WBAPP(p.ll)}" target="_blank" rel="noopener">Look around in Esri Wayback</a>.</p>`;return}
+  const frames=sat.map(([r,d])=>({r,d}));
+  const newest=(cache[p.key]||[])[0];
+  if(sat.length>=2&&newest&&new Date(newest.taken_at)>new Date(sat[sat.length-1][1]))frames.push({ground:newest.path,d:newest.taken_at});
+  if(sat.length<2){body.innerHTML=`<p class="note">No satellite history for this spot yet. <a href="${WBAPP(p.ll)}" target="_blank" rel="noopener">Look around in Esri Wayback</a>.</p>`;return}
   const Z=18,n=2**Z,fx=(p.ll[1]+180)/360*n,fy=(1-Math.asinh(Math.tan(p.ll[0]*Math.PI/180))/Math.PI)/2*n;
   const x0=Math.floor(fx)-1,y0=Math.floor(fy)-1,ox=(fx-x0)*256,oy=(fy-y0)*256;
   const launch=stats(p).L;
   const label=d=>new Date(d).toLocaleDateString("en-SG",{month:"short",year:"numeric"});
   const rel=d=>{if(!launch)return"";const m=Math.round((new Date(d)-launch)/2629746e3);if(m<-1){const y=Math.round(-m/12);return m<=-12?`${y} yr${y>1?"s":""} before launch`:`${-m} months before launch`}if(m<=1)return"Around launch";return m>=12?`${(m/12).toFixed(m%12?1:0).replace(".0","")} yrs after launch`:`${m} months after launch`};
-  body.innerHTML=`<div class="aview" role="img" aria-label="Satellite photo of the site"><div class="aworld" style="left:calc(50% - ${ox.toFixed(1)}px);top:calc(50% - ${oy.toFixed(1)}px)">${frames.map(([r],i)=>`<div class="aframe" data-f="${i}"${i===frames.length-1?"":' style="opacity:0"'}></div>`).join("")}</div><span class="apin" aria-hidden="true"></span><div class="acap"><b class="adate"></b><span class="arel"></span></div></div>
-   <div class="actl"><button type="button" class="aplay" aria-label="Play through the years">▶</button><div class="atrack"><input type="range" class="aslide" min="0" max="${frames.length-1}" step="1" value="${frames.length-1}" aria-label="Satellite photo date"><div class="aticks">${(()=>{let last=-1;return frames.map(([,d],i)=>{const x=i/(frames.length-1)*100,show=i===frames.length-1||last<0||x-last>=14;if(i===frames.length-1&&last>=0&&x-last<14)return"";if(!show)return"";last=x;return `<span style="left:${x.toFixed(2)}%">${d.slice(0,4)}</span>`}).join("")})()}</div></div></div>
-   <p class="acredit">Imagery: Esri, Vantor, Earthstar Geographics, via <a href="${WBAPP(p.ll)}" target="_blank" rel="noopener">World Imagery Wayback</a>. Singapore is usually re-photographed every year or two, so the newest frame may be months old.</p>`;
-  const fill=i=>{const f=body.querySelector(`.aframe[data-f="${i}"]`);if(!f||f.dataset.ok)return;f.dataset.ok=1;let h="";for(let dy=0;dy<3;dy++)for(let dx=0;dx<3;dx++)h+=`<img alt="" decoding="async" src="${WB}${frames[i][0]}/${Z}/${y0+dy}/${x0+dx}" style="left:${dx*256}px;top:${dy*256}px">`;f.innerHTML=h};
+  body.innerHTML=`<div class="aview" role="img" aria-label="Satellite photo of the site"><div class="aworld" style="left:calc(50% - ${ox.toFixed(1)}px);top:calc(50% - ${oy.toFixed(1)}px)">${frames.map((f,i)=>f.ground?"":`<div class="aframe" data-f="${i}"${i===frames.length-1?"":' style="opacity:0"'}></div>`).join("")}</div>${frames.map((f,i)=>f.ground?`<div class="aframe aground" data-f="${i}"><img alt="Latest community photo of the site" src="${pub(f.ground)}"></div>`:"").join("")}<span class="apin" aria-hidden="true"></span><div class="acap"><b class="adate"></b><span class="arel"></span></div></div>
+   <div class="actl"><button type="button" class="aplay" aria-label="Play through the years">▶</button><div class="atrack"><input type="range" class="aslide" min="0" max="${frames.length-1}" step="1" value="${frames.length-1}" aria-label="Satellite photo date"><div class="aticks">${(()=>{let last=-1;return frames.map(({d,ground},i)=>{const x=i/(frames.length-1)*100,show=i===frames.length-1||last<0||x-last>=14;if(i===frames.length-1&&last>=0&&x-last<14)return"";if(!show)return"";last=x;return `<span style="left:${x.toFixed(2)}%">${ground?"Now":d.slice(0,4)}</span>`}).join("")})()}</div></div></div>
+   <p class="acredit">Imagery: Esri, Vantor, Earthstar Geographics, via <a href="${WBAPP(p.ll)}" target="_blank" rel="noopener">World Imagery Wayback</a>. Singapore is usually re-photographed every year or two${frames[frames.length-1].ground?", so the last frame is the newest community photo from the album below":", so the newest frame may be months old"}.</p>`;
+  const fill=i=>{const f=body.querySelector(`.aframe[data-f="${i}"]`);if(!f||f.dataset.ok||f.classList.contains("aground"))return;f.dataset.ok=1;let h="";for(let dy=0;dy<3;dy++)for(let dx=0;dx<3;dx++)h+=`<img alt="" decoding="async" src="${WB}${frames[i].r}/${Z}/${y0+dy}/${x0+dx}" style="left:${dx*256}px;top:${dy*256}px">`;f.innerHTML=h};
   const sl=body.querySelector(".aslide");
-  const show=i=>{fill(i);body.querySelectorAll(".aframe").forEach(f=>f.style.opacity=+f.dataset.f===i?1:0);const d=frames[i][1];body.querySelector(".adate").textContent=label(d);body.querySelector(".arel").textContent=rel(d);sl.value=i;sl.setAttribute("aria-valuetext",label(d)+(rel(d)?", "+rel(d):""));fill(i-1);fill(i+1)};
+  const show=i=>{fill(i);body.querySelectorAll(".aframe").forEach(f=>f.style.opacity=+f.dataset.f===i?1:0);const F=frames[i],d=F.d,sub=F.ground?"From the ground · "+ago(new Date(d)):rel(d);body.querySelector(".aview").classList.toggle("isground",!!F.ground);body.querySelector(".adate").textContent=label(d);body.querySelector(".arel").textContent=sub;sl.value=i;sl.setAttribute("aria-valuetext",label(d)+(sub?", "+sub:""));fill(i-1);fill(i+1)};
   sl.addEventListener("input",()=>{stopPlay();show(+sl.value)});
   const btn=body.querySelector(".aplay");
   function stopPlay(){if(APLAY){clearInterval(APLAY);APLAY=null}btn.textContent="▶";btn.setAttribute("aria-label","Play through the years")}
@@ -1081,7 +1087,7 @@ async function uploadFile(key,file){
     say("Photo added to the album. Thanks for keeping this site up to date.","ok");
     const prev=STATUS[key];STATUS[key]={...(prev||{}),last:new Date(taken),photos30:((prev&&prev.photos30)||0)+1,...(sc.storeys!=null?{storeys:sc.storeys,at:new Date(taken)}:{}),...(sc.total?{total:(prev&&prev.total)||sc.total}:{})};
     refreshStatusUI();
-    await loadPhotos(key);
+    await loadPhotos(key);loadAerial(p);
     added(p,taken,wasNew);
   }catch(e){
     say("The upload didn't go through. Check your connection and try again.","err");
@@ -1303,7 +1309,7 @@ function sheetShown(url){
 function openSheet(i){
   const p=P[i];if(!p)return;SHEETKEY=p.key;
   hideWelcome();track("open",p.key);
-  $("#sheetbody").innerHTML=card(p);sheetShown("?p="+slug(p.name));loadPhotos(p.key);loadAerial(p);
+  $("#sheetbody").innerHTML=card(p);sheetShown("?p="+slug(p.name));loadAerial(p,loadPhotos(p.key));
 }
 function closeSheet(fromBack){
   if(APLAY){clearInterval(APLAY);APLAY=null}
