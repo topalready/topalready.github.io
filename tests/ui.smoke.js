@@ -24,7 +24,7 @@ async function page(b,{w=390,h=844,reduce=false,dataFail=false,sbFail=false,geo=
       if(r.request().method()==='POST')return r.fulfill({status:201,body:''});
       if(u.includes('storage/v1/object/public'))return r.fulfill({body:fs.readFileSync(R+'icon-512.png'),contentType:'image/png'});
       if(u.includes('project_status'))return r.fulfill({body:JSON.stringify([{project_key:'BTO:Bangkit Breeze:2025-07',last_photo:ago(1),photos_30d:1,photos:1,storeys:null,storeys_at:null,total_storeys:null}]),contentType:'application/json'});
-      if(u.includes('rest/v1/photos')&&u.includes('project_key=eq')&&u.includes('Bangkit'))return r.fulfill({body:JSON.stringify([{id:'a',path:'x/1.jpg',taken_at:ago(1),distance_m:140,storeys:null,total_storeys:null}]),contentType:'application/json'});
+      if(u.includes('rest/v1/photos')&&u.includes('project_key=eq')&&u.includes('Bangkit'))return r.fulfill({body:JSON.stringify([[1,140],[3,300],[38,220],[41,510],[150,90]].map(([d,m],i)=>({id:'a'+i,path:'x/'+i+'.jpg',taken_at:ago(d),distance_m:m,storeys:null,total_storeys:null}))),contentType:'application/json'});
       if(u.includes('rest/v1/photos')&&!u.includes('project_key=eq'))return r.fulfill({body:JSON.stringify([{id:'a',path:'x/1.jpg',taken_at:ago(1),project_key:'BTO:Bangkit Breeze:2025-07'},{id:'b',path:'x/2.jpg',taken_at:ago(9),project_key:'Condo:Hillhaven:2024-01'}]),contentType:'application/json'});
       return r.fulfill({body:'[]',contentType:'application/json'});
     }

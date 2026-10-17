@@ -75,6 +75,21 @@ input:focus-visible,button:focus-visible,a:focus-visible,label:focus-within{outl
 .note{font-size:.88rem;color:var(--muted);margin:0}
 .photos{border-top:3px dashed color-mix(in srgb,var(--edge) 30%,transparent);margin-top:18px;padding-top:16px}
 .photos h3{font-size:1.2rem;margin:0 0 4px}
+.album{margin:6px 0 4px}
+.month{margin:0 0 6px}
+.month h4{margin:10px 0 0;font-size:.85rem;font-weight:700;color:var(--ink);display:flex;align-items:baseline;gap:8px}
+.month h4 small{font-weight:500;color:var(--muted);font-size:.75rem}
+.albumempty{margin:8px 0;padding:14px;border:1.5px dashed var(--line);border-radius:14px;color:var(--muted);font-size:.9rem;text-align:center}
+.tvnhint{margin:6px 0 0;font-size:.8rem;color:var(--muted)}.tvnhint:empty{display:none}
+.tvnbox{margin:10px 0 4px;background:var(--tile);border-radius:16px;padding:10px}
+.tvnhead{display:flex;justify-content:space-between;align-items:baseline;margin:0 2px 8px}
+.tvnhead b{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:1.05rem}
+.tvnhead span{font-size:.8rem;font-weight:700;color:var(--hlink);background:var(--hl);border-radius:99px;padding:2px 10px}
+.tvnpair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tvnpair button{position:relative;padding:0;border:0;border-radius:12px;overflow:hidden;background:#000;cursor:pointer;aspect-ratio:3/4;font:inherit}
+.tvnpair img{width:100%;height:100%;object-fit:cover;display:block}
+.tvnpair span{position:absolute;left:0;right:0;bottom:0;padding:16px 8px 6px;color:#fff;font-size:.75rem;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.tvnpair span b{display:block;font-size:.9rem}
 .strip{display:flex;gap:10px;overflow-x:auto;padding:8px 2px 6px;scrollbar-width:thin}
 .strip button{flex:0 0 auto;width:80px;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--card);cursor:pointer;color:var(--muted);font:inherit;font-size:.72rem;font-weight:600;text-align:center;overflow:hidden}
 .strip button[aria-pressed=true]{border-color:var(--crane);box-shadow:0 0 0 3px var(--crane)}
@@ -350,12 +365,7 @@ input[type=text]{font-weight:400;border-radius:999px}
 .bldg .cam{display:none;position:absolute;left:50%;top:-12px;margin-left:16px;font-size:15px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
 .bldg.fresh .cam{display:block}
 .wanted{margin-bottom:22px}
-.repcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;margin:0 0 18px;box-shadow:var(--sh)}
 .rephead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}.rephead b{font-family:"Fraunces",Georgia,serif;font-size:1.1rem}.rephead span{font-size:.85rem;color:var(--muted)}
-.badges{display:flex;flex-wrap:wrap;gap:8px}
-.bdg{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;font-weight:600;padding:4px 10px 4px 6px;border-radius:99px;background:var(--tile);color:var(--muted);opacity:.45;filter:grayscale(1)}
-.bdg.on{opacity:1;filter:none;color:var(--ink);background:#FFF3D9;border:1px solid #F2D49A}
-.bdg i{font-style:normal}
 #cheer{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;background:rgba(30,24,40,.45);padding:16px}
 #cheer[hidden]{display:none}
 .cheercard{position:relative;z-index:2;background:var(--card);color:var(--ink);border-radius:24px;padding:22px 20px 18px;max-width:340px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:pop .35s cubic-bezier(.3,1.6,.6,1)}
@@ -363,27 +373,13 @@ input[type=text]{font-weight:400;border-radius:999px}
 .cheericon{font-size:2.6rem}
 .cheercard>b{display:block;font-family:"Fraunces",Georgia,serif;font-size:1.4rem;margin:4px 0}
 .cheercard p{margin:0 0 12px;color:var(--muted);font-size:.92rem}
-.newbdg{display:flex;align-items:center;gap:10px;text-align:left;background:#FFF3D9;border:1px solid #F2D49A;border-radius:14px;padding:8px 12px;margin:0 0 10px}
-.newbdg i{font-style:normal;font-size:1.6rem}.newbdg small{display:block;font-size:.72rem;color:#9A5B12;font-weight:600;text-transform:uppercase;letter-spacing:.06em}.newbdg b{font-size:1rem}
 .confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 .confetti i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:fall 2s ease-in forwards}
 @keyframes fall{to{top:105%;transform:rotate(540deg) translateX(30px)}}
 @media (prefers-reduced-motion:reduce){.confetti{display:none}.cheercard{animation:none}}
 .colbar{width:100%!important;margin:0 0 12px!important;height:10px!important}
 .colbar i{background:linear-gradient(90deg,#FFB86B,#F59BB0)!important}
-.colgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.coltile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;aspect-ratio:1;border-radius:14px;border:1.5px dashed rgba(58,44,38,.25);background:var(--tile);font:inherit;color:var(--muted);padding:6px;overflow:hidden;cursor:pointer;text-align:center}
-.coltile b{flex:1;display:grid;place-items:center;font-family:"Fraunces",Georgia,serif;font-size:1.8rem;color:rgba(58,44,38,.3)}
-.coltile span{font-size:.7rem;font-weight:600;line-height:1.15;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.coltile small{font-size:.65rem}
-.coltile.got{border:0;padding:0;background:#000}
-.coltile.got img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.coltile.got span{position:relative;width:100%;padding:14px 6px 6px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.65))}
-.coltile.got i{position:absolute;top:6px;right:6px;font-style:normal;font-size:.7rem;font-weight:700;background:#FFD36E;color:#4A3410;border-radius:99px;padding:1px 7px}
 .bldg .stamp{display:none;position:absolute;left:50%;top:-12px;margin-left:-30px;width:20px;height:20px;border-radius:50%;background:#62C07A;color:#fff;font:700 12px/20px "Figtree",system-ui,sans-serif;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.3)}
-.bldg.got .stamp{display:block}
-.bldg.got .spark{display:none}
-#colchip{cursor:pointer;font:inherit;font-weight:600;font-size:.8rem;color:var(--ink)}
 .explain{margin:4px 0 10px;font-size:.84rem;color:var(--muted)}
 .facts small{display:block;font-size:.72rem;color:var(--muted);font-weight:500;margin-top:2px}
 .wpct small{display:block;font-family:"Figtree",system-ui,sans-serif;font-size:.72rem;font-weight:600;color:var(--muted)}
@@ -405,19 +401,16 @@ input[type=text]{font-weight:400;border-radius:999px}
 .edge{font-size:.8rem;min-height:32px}
 .ncard .meta{font-size:.82rem}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-.coltile:focus-visible,.chip:focus-visible,.ncard:focus-visible,.wrow:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.chip:focus-visible,.ncard:focus-visible,.wrow:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){#sheet .panel,#sheet .back,.toast,.view{animation:none!important;transition:none!important}.bldg .spark{animation:none}}
 #map .maplibregl-ctrl-bottom-right{bottom:var(--nearh,200px)}
 #map .maplibregl-ctrl-attrib{font-size:11px}
-.savenote{margin:10px 0 10px;font-size:.8rem;color:var(--muted);background:var(--tile);border-radius:12px;padding:8px 10px}
 /* highlighted surfaces that stay readable in dark mode */
 :root{--hl:#FFF6D9;--hlink:#3A2C26;--hlline:#F2D49A}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--hl:#4A3F22;--hlink:#FFF3D9;--hlline:#8A7340}}
 :root[data-theme="dark"]{--hl:#4A3F22;--hlink:#FFF3D9;--hlline:#8A7340}
 .ncard.here{background:var(--hl);color:var(--hlink)}
 .ncard.here .meta,.ncard.here .go{color:var(--hlink)}
-.bdg.on{background:var(--hl);color:var(--hlink);border-color:var(--hlline)}
-.newbdg{background:var(--hl);border-color:var(--hlline);color:var(--hlink)}
 .newbdg small{color:var(--hlink);opacity:.8}
 .nudge{background:var(--hl);color:var(--hlink)}
 /* light switch + night skin */
@@ -463,7 +456,6 @@ html[data-ph=night] .bldg.seen .lbl{background:#6B5A2A}
 </g></svg></div></div>
   <div class="mtop">
     <div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="text" id="q" placeholder="Search a BTO, condo or postal code" autocomplete="off" aria-label="Search projects"><ul class="sugg" id="sugg"></ul></div>
-    <button type="button" class="found" id="colchip" title="Sites you've photographed" aria-label="Your photo collection: sites you've photographed"><span aria-hidden="true">📸</span> <b id="wfound">0</b>/<span id="wtotal">0</span></button>
     <button type="button" id="lightbtn" class="lightbtn" aria-label="Day or night"></button>
   </div>
   <div class="welcome" id="welcome" hidden><b>Waiting for your BTO or condo?</b><p>Search for your project to see its estimated timeline, any announced delays and real site photos from people nearby. Or drag the map to explore.</p><p class="wsmall">No ads, no login.</p><p class="wsmall"><span aria-hidden="true">📸</span> at the top counts the sites you've photographed.</p><div class="wbtns"><button type="button" id="welcomesearch">Find my project</button><button type="button" id="welcomeok" class="wghost">Explore the map</button></div></div>
@@ -480,15 +472,13 @@ html[data-ph=night] .bldg.seen .lbl{background:#6B5A2A}
 
 <section id="v-disc" class="view" aria-label="Discover"><div class="pagewrap">
   <h1><img src="icon-192.png" width="36" height="36" alt="" style="border-radius:10px">Community</h1>
-  <p class="lede">Candid photos snapped by people passing by, all taken at the site in the last 14 days. No ads, no login.</p>
-  <div class="snap"><p><b>Passing a site? Collect it!</b>Snap any BTO or condo under construction to add it to your collection and help everyone watching it grow.</p><button type="button" class="add" id="snapbtn">Snap a site</button></div>
+  <p class="lede">Candid photos snapped by people passing the sites, building up a month-by-month album for every project. No ads, no login.</p>
+  <div class="snap"><p><b>Passing a site? Snap it!</b>Every photo is added to that project's progress album, so everyone waiting can see how it's moving month by month.</p><button type="button" class="add" id="snapbtn">Snap a site</button></div>
   <h2 class="sect">Latest from the sites</h2>
   <div class="feed" id="feed"><p class="note">Loading photos…</p></div>
   <h2 class="sect">Wanted: fresh photos</h2>
-  <p class="note" style="margin:-4px 0 10px">These sites haven't had a photo in a while. Passing by one? Be its reporter.</p>
+  <p class="note" style="margin:-4px 0 10px">These sites haven't had a photo in the last 14 days. Passing by one? Add this month's photo to its album.</p>
   <div class="chips wanted" id="wanted"></div>
-  <h2 class="sect">Your collection</h2>
-  <div id="reporter"></div>
   <h2 class="sect">Worth a look</h2>
   <section id="explore" aria-label="Project shelves"></section>
   <div id="tipslot"></div>
@@ -510,7 +500,7 @@ html[data-ph=night] .bldg.seen .lbl{background:#6B5A2A}
   <span id="lbcount"></span>
 </div>
 <div id="sheet" hidden role="dialog" aria-modal="true" aria-label="Project details"><div class="back" data-close></div><div class="panel"><div class="grab"><span></span><button type="button" class="xbtn" data-close aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div id="sheetbody"></div></div></div>
-<div id="cheer" hidden aria-live="polite"><div class="confetti" aria-hidden="true"></div><div class="cheercard"><div class="cheericon">📸</div><b id="cheerh">Site reported!</b><p id="cheerp"></p><div id="cheerbadge"></div><button type="button" class="add" id="cheerok">Nice!</button></div></div>
+<div id="cheer" hidden aria-live="polite"><div class="confetti" aria-hidden="true"></div><div class="cheercard"><div class="cheericon">📸</div><b id="cheerh">Added to the album!</b><p id="cheerp"></p><button type="button" class="add" id="cheerok">Nice!</button></div></div>
 <dialog id="sharebox" aria-labelledby="sb-h">
   <h2 id="sb-h">Your progress card</h2>
   <img id="sb-img" alt="Progress card preview">
@@ -538,6 +528,7 @@ const PASTELS=["#FFB8A3","#B9E6C6","#FFE08A","#FFD3B5","#CFE8A6","#C9E9F6"];
 const hash=s=>[...s].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7);
 const norm=s=>s.toUpperCase().replace(/[’']/g,"").replace(/\b(BLK|BLOCK)\b/g," ").replace(/\bAVE\b/g,"AVENUE").replace(/\bST\b/g,"STREET").replace(/\bRD\b/g,"ROAD").replace(/\bDR\b/g,"DRIVE").replace(/\bCRES\b/g,"CRESCENT").replace(/[^A-Z0-9@ ]/g," ").replace(/\s+/g," ").trim();
 function ago(d){const days=Math.floor((Date.now()-d)/864e5);return days<=0?"today":days===1?"yesterday":days<31?days+" days ago":fmtDay(d)}
+try{localStorage.removeItem("storeys.collection");localStorage.removeItem("storeys.reporter")}catch(e){}
 function keepSafe(){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist().catch(()=>{})}catch(e){}}
 function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||"null");localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
 
@@ -550,7 +541,7 @@ let FEED=[];
 async function loadFeed(){
   const box=$("#feed");
   try{
-    const r=await fetch(`${SB}/rest/v1/photos?select=id,path,taken_at,project_key,storeys&order=taken_at.desc&limit=40`,{headers:H});
+    const r=await fetch(`${SB}/rest/v1/photos?select=id,path,taken_at,project_key,storeys&order=taken_at.desc&limit=300`,{headers:H});
     if(!r.ok)throw 0;
     const rows=(await r.json()).map(x=>({...x,p:P.find(p=>p.key===x.project_key)})).filter(x=>x.p);FEED=rows;
     box.innerHTML=rows.length?rows.map((x,j)=>`<button type="button" class="ph" data-feed="${j}"><img loading="lazy" src="${thumb(x.path)}" alt="${esc(x.p.name)}, ${esc(fmtDay(new Date(x.taken_at)))}"><span><b>${esc(x.p.name.replace(/\s*\(.*?\)/,""))}</b>Taken ${esc(fmtDay(new Date(x.taken_at)).replace(/ \d{4}$/,""))} · ${esc(ago(new Date(x.taken_at)))}</span></button>`).join(""):
@@ -820,9 +811,10 @@ function card(p){
     <button type="button" class="add sharebtn" data-share="${esc(p.key)}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Share progress card</button>
     ${sourcesHTML(p)}
     <div class="photos">
-      <h3>Site photos</h3>
-      <p class="note">Shared by people within 800 m of the site in the last 14 days. Not verified by ${p.kind==="BTO"?"HDB":"the developer"}.</p>
-      <div class="strip" aria-label="Photo timeline, newest first"></div>
+      <h3>Progress album</h3>
+      <p class="note">Photos from people passing the site, grouped by month. Each was taken within 800 m of the site and added within 14 days. Not verified by ${p.kind==="BTO"?"HDB":"the developer"}.</p>
+      <div class="tvn"></div>
+      <div class="album" aria-label="Progress album, newest month first"></div>
       ${p.ll?`<label class="add">Add a site photo<input type="file" accept="image/*" data-up="${esc(p.key)}"></label>
       <p class="note howto">You need to be within 800 m of the site, using a photo from the last 14 days. We read the location saved in the photo, or ask for yours if there isn't one. Your exact location isn't stored. Photos appear for everyone straight away and can be reported. Shoot the building, not faces or homes. <a href="privacy.html">Photo rules</a></p>`:`<p class="note">Photo uploads open once this site is on the map.</p>`}
       <p class="status" role="status"></p>
@@ -881,20 +873,38 @@ async function loadPhotos(key){
   showPhotos(key,0);
   document.querySelectorAll(`[data-built]`).forEach(el=>{if(el.dataset.built===key){const p=P.find(q=>q.key===key);if(p)el.innerHTML=builtHTML(p)}});
 }
+const monthKey=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+const monthName=d=>d.toLocaleDateString("en-SG",{month:"long",year:"numeric"});
+function gapTxt(days){if(days>=56){const m=Math.round(days/30.44);return m>=24&&m%12===0?m/12+" years apart":m+" months apart"}const w=Math.round(days/7);return w+" week"+(w>1?"s":"")+" apart"}
+function groupMonths(list){const g=[];list.forEach((x,i)=>{const d=new Date(x.taken_at),k=monthKey(d);let m=g[g.length-1];if(!m||m.k!==k){m={k,d,items:[]};g.push(m)}m.items.push({x,i})});return g}
+function thenNow(list){ // oldest vs newest, only once they're at least four weeks apart
+  if(!list||list.length<2)return null;const a=list.length-1,days=(new Date(list[0].taken_at)-new Date(list[a].taken_at))/864e5;
+  return days>=28?{old:a,now:0,days}:null}
 function showPhotos(key,idx){
   const c=cardFor(key);if(!c)return;
-  const list=cache[key],scene=c.querySelector(".scene"),strip=c.querySelector(".strip");
+  const list=cache[key],scene=c.querySelector(".scene"),album=c.querySelector(".album"),tvn=c.querySelector(".tvn");
+  if(!album)return;
   if(!list||!list.length){
-    const p=P.find(x=>x.key===key);
-    if(list&&p&&!p.ll){strip.innerHTML="";return}
-    strip.innerHTML=list===null?`<p class="note">Photos couldn't load right now.</p>`:`<p class="note">No photos yet. Be the first to add one when you pass by.</p>`;
+    const p=P.find(x=>x.key===key);tvn.innerHTML="";
+    if(list&&p&&!p.ll){album.innerHTML="";return}
+    album.innerHTML=list===null?`<p class="note">Photos couldn't load right now.</p>`:`<p class="albumempty">📷 No photos yet. Passing by? Yours will be the first page of this site's album.</p>`;
     return;
   }
   const ph=list[idx],when=new Date(ph.taken_at);
   const stale=Date.now()-new Date(list[0].taken_at)>FRESH_DAYS*864e5;
   scene.className="scene photo";
-  scene.innerHTML=`<button type="button" class="phopen" data-lb="${idx}" data-k="${esc(key)}" aria-label="View photo full screen"><img src="${pub(ph.path)}" alt="Site photo taken ${esc(fmtDay(when))}"></button><div class="cap"><div><b>Taken ${esc(ago(when))}</b>${ph.distance_m} m from the site</div><button class="linkbtn" type="button" data-report="${ph.id}" data-k="${esc(key)}">Report photo</button></div>`;
-  strip.innerHTML=(stale&&idx===0?`<p class="nudge">📸 Last photo was ${esc(ago(new Date(list[0].taken_at)))}. Passing by? Add a fresh one.</p>`:"")+list.map((x,i)=>`<button type="button" aria-pressed="${i===idx}" data-show="${i}" data-k="${esc(key)}"><img loading="lazy" src="${thumb(x.path)}" alt="">${esc(fmtDay(new Date(x.taken_at)).replace(/ \d{4}$/,""))}</button>`).join("");
+  scene.innerHTML=`<button type="button" class="phopen" data-lb="${idx}" data-k="${esc(key)}" aria-label="View photo full screen"><img src="${pub(ph.path)}" alt="Site photo taken ${esc(fmtDay(when))}"></button><div class="cap"><div><b>Taken ${esc(fmtDay(when))}</b>${esc(ago(when))} · ${ph.distance_m} m from the site</div><button class="linkbtn" type="button" data-report="${ph.id}" data-k="${esc(key)}">Report photo</button></div>`;
+  const tn=thenNow(list),months=groupMonths(list);
+  tvn.innerHTML=tn?`<div class="tvnbox"><div class="tvnhead"><b>Then and now</b><span>${esc(gapTxt(tn.days))}</span></div><div class="tvnpair">${[["Then",tn.old],["Now",tn.now]].map(([l,i])=>`<button type="button" data-lb="${i}" data-k="${esc(key)}" aria-label="${l}: photo from ${esc(fmtDay(new Date(list[i].taken_at)))}"><img loading="lazy" src="${pub(list[i].path)}" alt=""><span><b>${l}</b>${esc(fmtDay(new Date(list[i].taken_at)))}</span></button>`).join("")}</div></div>`
+    :`<p class="tvnhint">${months.length===1?"All photos so far are from "+esc(monthName(months[0].d))+". Once there's a photo from a few weeks later, you'll see a then-and-now comparison here.":""}</p>`;
+  album.innerHTML=(stale&&idx===0?`<p class="nudge">📸 Last photo was ${esc(ago(new Date(list[0].taken_at)))}. Passing by? Add this month's page.</p>`:"")+
+    months.map(m=>`<div class="month"><h4>${esc(monthName(m.d))}<small>${m.items.length} photo${m.items.length>1?"s":""}</small></h4><div class="strip">${m.items.map(({x,i})=>`<button type="button" aria-pressed="${i===idx}" data-show="${i}" data-k="${esc(key)}"><img loading="lazy" src="${thumb(x.path)}" alt="">${esc(fmtDay(new Date(x.taken_at)).replace(/ \d{4}$/,""))}</button>`).join("")}</div></div>`).join("");
+}
+function added(p,taken,wasNew){
+  const name=p.name.replace(/\s*\(.*?\)/,""),list=cache[p.key]||[],tn=thenNow(list);
+  $("#cheerp").textContent=`Your photo is now on the ${monthName(new Date(taken))} page of ${name}'s progress album. `+(wasNew?"It's the very first photo of this site. ":"")+(tn?`You can compare it with a photo from ${gapTxt(tn.days).replace(" apart","")} earlier.`:"Come back in a month or two and you'll see the difference.");
+  const cf=$("#cheer .confetti");cf.innerHTML=Array.from({length:36},(_,i)=>`<i style="left:${Math.random()*100}%;background:${["#FFB8A3","#FFD36E","#9FD0EE","#B9E6C6","#F59BB0","#C9B8F5"][i%6]};animation-delay:${(Math.random()*.4).toFixed(2)}s;animation-duration:${(1.4+Math.random()*1.2).toFixed(2)}s;transform:rotate(${Math.random()*360}deg)"></i>`).join("");
+  $("#cheer").hidden=false;$("#cheerok").focus();
 }
 
 
@@ -920,9 +930,9 @@ function builtHTML(p){
   return `<div class="builtrow empty"><span class="bico" aria-hidden="true">📸</span><div><b>How far is it really built?</b><span>No storey count yet. Add a site photo and tell us how many floors are up.</span></div></div>`;
 }
 function refreshStatusUI(){
-  MARKS.forEach(m=>{m.el.classList.toggle("fresh",isFresh(m.p.key));m.el.classList.toggle("got",isCollected(m.p.key))});updFound();
+  MARKS.forEach(m=>m.el.classList.toggle("fresh",isFresh(m.p.key)));
   document.querySelectorAll("[data-built]").forEach(el=>{const p=P.find(q=>q.key===el.dataset.built);if(p)el.innerHTML=builtHTML(p)});
-  renderWanted();renderReporter();
+  renderWanted();
 }
 function renderWanted(){
   const box=$("#wanted");if(!box)return;
@@ -933,50 +943,6 @@ function renderWanted(){
 }
 $("#wanted").addEventListener("click",e=>{const c=e.target.closest(".chip");if(!c)return;const p=P[+c.dataset.i];setTab("map");if(p.ll)flyTo(p.i,true);else openSheet(p.i)});
 
-/* ---------- Collect them all: your photographed sites, kept on this phone ---------- */
-const myCol=()=>store("storeys.collection")||{};
-const isCollected=key=>!!myCol()[key];
-const myRep=()=>({photos:0,night:0,early:0,pioneer:0,revisit:0,...(store("storeys.reporter")||{})});
-function colStats(){const c=myCol(),keys=Object.keys(c).filter(k=>P.some(p=>p.key===k)),ps=keys.map(k=>P.find(p=>p.key===k));
-  return{n:keys.length,bto:ps.filter(p=>p.kind==="BTO").length,condo:ps.filter(p=>p.kind!=="BTO").length,...myRep()}}
-const BADGES=[
- ["first","🐣","First stamp","Collect your first site",r=>r.n>=1],
- ["five","🧺","Collector","Collect 5 sites",r=>r.n>=5],
- ["pioneer","🚩","Pioneer","Be the first ever to photograph a site",r=>r.pioneer>=1],
- ["hdb","🏢","HDB hero","Collect 5 BTOs",r=>r.bto>=5],
- ["condo","🏙️","Condo spotter","Collect 3 condos",r=>r.condo>=3],
- ["tracker","🔁","Progress tracker","Photograph the same site again a week later",r=>r.revisit>=1],
- ["night","🌙","Night owl","Snap a site after 7pm",r=>r.night>=1],
- ["early","🌅","Early bird","Snap a site before 8am",r=>r.early>=1],
- ["ten","🎯","Site hunter","Collect 10 sites",r=>r.n>=10],
- ["legend","🏆","Legend","Collect 25 sites",r=>r.n>=25]];
-function renderReporter(){
-  const box=$("#reporter");if(!box)return;const r=colStats(),c=myCol(),total=P.filter(p=>p.ll).length;
-  const mine=Object.entries(c).map(([k,v])=>({p:P.find(q=>q.key===k),v})).filter(x=>x.p).sort((a,b)=>new Date(b.v.at)-new Date(a.v.at));
-  const ref=MYPOS||(MAP?centre():null);
-  const next=P.filter(p=>p.ll&&!c[p.key]&&stats(p).pct!=null&&stats(p).pct<100).map(p=>({p,d:ref?metres(ref,p.ll):0})).sort((a,b)=>a.d-b.d).slice(0,mine.length?3:6);
-  box.innerHTML=`<div class="repcard"><div class="rephead"><b>${r.n} of ${total} sites collected</b></div>
-   <span class="bbar colbar"><i style="width:${Math.max(r.n?3:0,r.n/total*100)}%"></i></span>
-   <div class="colgrid">${mine.map(({p,v})=>`<button type="button" class="coltile got" data-i="${p.i}"><img loading="lazy" src="${thumb(v.path)}" alt=""><span>${esc(p.name.replace(/\s*\(.*?\)/,""))}</span><i>${v.n>1?"×"+v.n:"✓"}</i></button>`).join("")}${next.map(({p,d})=>`<button type="button" class="coltile" data-i="${p.i}"><b>?</b><span>${esc(p.name.replace(/\s*\(.*?\)/,""))}</span><small>${ref?distTxt(d)+" away":"Not yet"}</small></button>`).join("")}</div>
-   <p class="note" style="margin:10px 0 8px">${r.n?"Pass by any BTO or condo site, snap it, and it's added to your collection.":"Pass by any BTO or condo site and snap it to start your collection. Every site you photograph is yours to keep."}</p>
-   <p class="savenote">🔒 Your collection, badges and watchlist are saved in this browser on this device, with no account. They can be lost if you clear this browser's data, use private browsing, or switch phone or browser. On iPhone, Safari may clear it after seven days of using Safari without opening TOP Already?. Adding it to your Home Screen avoids that rule, but it isn't a backup.</p>
-   <div class="badges">${BADGES.map(([id,ic,name,desc,ok])=>`<span class="bdg${ok(r)?" on":""}" title="${esc(desc)}"><i>${ic}</i>${esc(name)}</span>`).join("")}</div></div>`;
-}
-$("#reporter").addEventListener("click",e=>{const t=e.target.closest(".coltile");if(!t)return;const p=P[+t.dataset.i];setTab("map");if(p.ll)flyTo(p.i,true);else openSheet(p.i)});
-$("#colchip").addEventListener("click",()=>{setTab("disc");setTimeout(()=>$("#reporter").scrollIntoView({behavior:"smooth",block:"start"}),60)});
-function collect(p,path,wasNew){
-  const before=colStats(),c=myCol(),r=myRep(),now=new Date(),h=now.getHours(),prev=c[p.key];
-  r.photos++;if(h>=19||h<5)r.night++;if(h>=5&&h<8)r.early++;if(wasNew)r.pioneer++;
-  if(prev&&now-new Date(prev.at)>7*864e5)r.revisit++;
-  c[p.key]={path,at:now.toISOString(),n:(prev?prev.n:0)+1};store("storeys.collection",c);store("storeys.reporter",r);keepSafe();
-  const after=colStats(),fresh=BADGES.filter(b=>b[4](after)&&!b[4](before)),name=p.name.replace(/\s*\(.*?\)/,""),total=P.filter(q=>q.ll).length;
-  $("#cheerh").textContent=prev?`${name}, updated!`:`${name} collected!`;
-  $("#cheerp").textContent=(wasNew?`You're the first person ever to photograph this site. `:"")+(prev?`Nice, you're tracking how it changes. `:"")+`That's ${after.n} of ${total} sites in your collection.`;
-  $("#cheerbadge").innerHTML=fresh.map(b=>`<div class="newbdg"><i>${b[1]}</i><div><small>Badge unlocked</small><b>${esc(b[2])}</b></div></div>`).join("");
-  const cf=$("#cheer .confetti");cf.innerHTML=Array.from({length:36},(_,i)=>`<i style="left:${Math.random()*100}%;background:${["#FFB8A3","#FFD36E","#9FD0EE","#B9E6C6","#F59BB0","#C9B8F5"][i%6]};animation-delay:${(Math.random()*.4).toFixed(2)}s;animation-duration:${(1.4+Math.random()*1.2).toFixed(2)}s;transform:rotate(${Math.random()*360}deg)"></i>`).join("");
-  $("#cheer").hidden=false;$("#cheerok").focus();
-  updFound();MARKS.forEach(m=>m.el.classList.toggle("got",isCollected(m.p.key)));
-}
 $("#cheerok").addEventListener("click",()=>{$("#cheer").hidden=true});
 $("#cheer").addEventListener("click",e=>{if(e.target.id==="cheer")$("#cheer").hidden=true});
 
@@ -1063,10 +1029,11 @@ async function uploadFile(key,file){
     const r=await fetch(`${SB}/rest/v1/photos`,{method:"POST",headers:{...H,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({project_key:key,path,taken_at:taken,distance_m:d,storeys:sc.storeys,total_storeys:sc.total})});
     if(!r.ok){let m="";try{m=(await r.json()).message||""}catch(_){}if(/Too many|Lots of uploads/.test(m))return say(m,"err");throw new Error("row "+r.status)}
     track("upload",key);
-    say("Photo added. Thanks for keeping this site up to date.","ok");
+    say("Photo added to the album. Thanks for keeping this site up to date.","ok");
     const prev=STATUS[key];STATUS[key]={...(prev||{}),last:new Date(taken),photos30:((prev&&prev.photos30)||0)+1,...(sc.storeys!=null?{storeys:sc.storeys,at:new Date(taken)}:{}),...(sc.total?{total:(prev&&prev.total)||sc.total}:{})};
-    collect(p,path,wasNew);refreshStatusUI();
+    refreshStatusUI();
     await loadPhotos(key);
+    added(p,taken,wasNew);
   }catch(e){
     say("The upload didn't go through. Check your connection and try again.","err");
   }finally{if(btn)btn.removeAttribute("aria-disabled")}
@@ -1178,7 +1145,7 @@ function bldgSvg(p){
   g+=`<path d="M${fx} ${yb}l${dx} ${dy}h${fw}l${-dx} ${-dy}Z" fill="${done?mix(F[0],"#fff",.4):"#E3DCD0"}"/>`;
   if(!done){const cx=fx+fw+dx+6,mt=Math.max(4,yb-16);g+=`<g stroke="#C98F1E" stroke-width="1.6" fill="none"><path d="M${cx} ${G-2}V${mt}M${cx-30} ${mt}H${cx+8}"/><path d="M${cx-18} ${mt}V${yb-4}" stroke-width=".8"/></g><rect x="${cx-21}" y="${yb-5}" width="7" height="3" fill="#F29AAE"/><rect x="${fx-1}" y="${yb}" width="${fw+2}" height="${Math.min(2,built)*fh}" fill="#5FB27C" opacity=".65"/>`}
   const short=p.name.replace(/\s*\(.*?\)/,"");
-  return `<svg width="112" height="140" viewBox="0 0 56 70" style="overflow:visible">${g}</svg><span class="spark" aria-hidden="true"></span><span class="cam" title="Fresh site photo">📷</span><span class="stamp" title="In your collection">✓</span><span class="lbl">${esc(short.length>22?short.slice(0,21)+"…":short)}</span>`;
+  return `<svg width="112" height="140" viewBox="0 0 56 70" style="overflow:visible">${g}</svg><span class="spark" aria-hidden="true"></span><span class="cam" title="Fresh site photo">📷</span><span class="lbl">${esc(short.length>22?short.slice(0,21)+"…":short)}</span>`;
 }
 /* ---------- Map world: day, golden hour and night ---------- */
 function worldStyle(ph){
@@ -1269,7 +1236,7 @@ function setTab(t){
   document.querySelectorAll("#tabs [data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
   for(const [id,name] of [["v-map","map"],["v-watch","watch"],["v-disc","disc"]])$("#"+id).classList.toggle("on",name===t);
   if(t==="map"&&MAP)setTimeout(()=>MAP.resize(),50);
-  if(t==="watch")render();if(t==="disc"){loadFeed();renderWanted();renderReporter()}
+  if(t==="watch")render();if(t==="disc"){loadFeed();renderWanted()}
 }
 document.addEventListener("click",e=>{const t=e.target.closest("[data-tab]");if(t)setTab(t.dataset.tab)});
 function badge(){const n=tracked.length;$("#tbadge").hidden=!n;$("#tbadge").textContent=n}
@@ -1350,11 +1317,11 @@ function initMap(){
   MAP.once("idle",()=>{const a=document.querySelector("#map .maplibregl-ctrl-attrib");if(a)a.classList.remove("maplibregl-compact-show")});
   setTimeout(()=>{if(MAP&&!MAP.loaded())toast("The map is slow to load. Your connection may be patchy.")},12000);
   MAP.on("styleimagemissing",e=>{const im=poiIcon(e.id);if(im&&!MAP.hasImage(e.id))MAP.addImage(e.id,im,{pixelRatio:2})});
-  const here=P.filter(p=>p.ll);$("#wtotal").textContent=here.length;
+  const here=P.filter(p=>p.ll);
   MARKS=here.map(p=>{const el=document.createElement("div");el.className="bldg"+(found.has(p.key)?" seen":"");el.innerHTML=`<div class="inner">${bldgSvg(p)}</div>`;el.setAttribute("role","button");el.setAttribute("aria-label",p.name);
     el.addEventListener("click",e=>{e.stopPropagation();openSheet(p.i)});
     const mk=new maplibregl.Marker({element:el,anchor:"bottom",offset:[0,8]}).setLngLat([p.ll[1],p.ll[0]]).addTo(MAP);mk.p=p;mk.el=el;return mk});
-  updFound();scaleSprites();nearby();requestAnimationFrame(edges);
+  scaleSprites();nearby();requestAnimationFrame(edges);
   let lastC=MAP.project(MAP.getCenter()),stopT=0;
   MAP.on("zoom",scaleSprites);
   MAP.on("move",()=>{
@@ -1369,10 +1336,9 @@ function initMap(){
   MAP.on("load",()=>{nearby();edges()});
 }
 function scaleSprites(){if(!MAP)return;const z=MAP.getZoom(),s=Math.max(.32,Math.min(1,(z-12.5)/3.5));const box=MAP.getContainer();box.style.setProperty("--s",s.toFixed(2));box.style.setProperty("--lbl",z>=15?"block":"none")}
-function updFound(){$("#wfound").textContent=Object.keys(myCol()).filter(k=>P.some(p=>p.key===k)).length}
 function discover(){
   if(!MAP||MAP.getZoom()<14.5)return;const c=centre();
-  for(const mk of MARKS){if(found.has(mk.p.key))continue;if(metres(c,mk.p.ll)<160){found.add(mk.p.key);store(FOUND_KEY,[...found]);mk.el.classList.add("seen");updFound();toast(isCollected(mk.p.key)?"Back at "+mk.p.name.replace(/\s*\(.*?\)/,""):"Spotted "+mk.p.name.replace(/\s*\(.*?\)/,"")+"! Snap it to collect 📸")}}
+  for(const mk of MARKS){if(found.has(mk.p.key))continue;if(metres(c,mk.p.ll)<160){found.add(mk.p.key);store(FOUND_KEY,[...found]);mk.el.classList.add("seen");toast("Spotted "+mk.p.name.replace(/\s*\(.*?\)/,""))}}
 }
 function busiest(){ // project with the most other projects within 2.5 km, so first-timers land among buildings
   let best=null,bn=-1;for(const p of P){if(!p.ll)continue;const n=P.filter(q=>q.ll&&metres(p.ll,q.ll)<2500).length;if(n>bn){bn=n;best=p}}return best}

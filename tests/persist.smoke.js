@@ -1,4 +1,4 @@
-// Closes and reopens a real browser profile to confirm collection, badges, watchlist and settings survive.
+// Closes and reopens a real browser profile to confirm the watchlist and settings survive.
 // Run from the folder above the repo: node topalready.github.io/tests/persist.smoke.js
 const {chromium}=require('playwright');const fs=require('fs');
 const R='topalready.github.io/';
@@ -19,35 +19,30 @@ async function open(origin='https://x.test/'){
   await pg.goto(origin);await pg.waitForTimeout(2500);return {ctx,pg,errs};
 }
 const snap=pg=>pg.evaluate(()=>{const ls={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('storeys'))ls[k]=localStorage.getItem(k)}
-  setTab('disc');renderReporter();return{ls,col:colStats(),badges:[...document.querySelectorAll('#reporter .bdg.on')].map(b=>b.textContent.trim()),chip:$('#wfound').textContent,
-  tiles:document.querySelectorAll('#reporter .coltile.got').length,watch:tracked.slice(),light:LIGHT,welcomeHidden:$('#welcome').hidden,gotSprites:document.querySelectorAll('.bldg.got').length,note:!!$('.savenote')}});
+  return{ls,watch:tracked.slice(),light:LIGHT,welcomeHidden:$('#welcome').hidden,found:found.size}});
 (async()=>{
  // ---- session 1: earn things ----
  let {ctx,pg,errs}=await open();
  await pg.evaluate(async()=>{hideWelcome();
-   const up=async i=>{openSheet(i);window.readExif=()=>({gps:P[i].ll,date:new Date()});
-     const bl=await new Promise(r=>{const c=document.createElement('canvas');c.width=40;c.height=30;c.toBlob(r,'image/jpeg')});await uploadFile(P[i].key,new File([bl],'x.jpg',{type:'image/jpeg'}));$('#cheer').hidden=true;closeSheet()};
-   const ids=[...P.filter(p=>p.ll&&p.kind==='BTO').slice(0,5),P.find(p=>p.name==='Hillhaven')].map(p=>p.i);for(const i of ids)await up(i);
    tracked=[P.find(p=>p.name==='Bangkit Breeze').key];saveTracked();
    LIGHT='night';localStorage.setItem('storeys.light','night');
    store('storeys.reported',['abc']);found.add(P[0].key);store(FOUND_KEY,[...found]);
  });
  await pg.waitForTimeout(500);const before=await snap(pg);
  console.log('SESSION 1 saved keys:',Object.keys(before.ls).join(', '));
- console.log('  collected',before.col.n,'badges',JSON.stringify(before.badges),'chip',before.chip,'note shown',before.note,'errors',JSON.stringify(errs));
+ console.log('  errors',JSON.stringify(errs));
  await ctx.close(); // full browser shutdown
  // ---- session 2: reopen same browser profile ----
  ({ctx,pg,errs}=await open());const after=await snap(pg);
  const same=k=>JSON.stringify(before[k])===JSON.stringify(after[k]);
  for(const k of Object.keys(before.ls))console.log((before.ls[k]===after.ls[k]?'PASS ':'FAIL ')+'kept '+k);
- for(const k of ['col','badges','chip','tiles','watch','light','welcomeHidden'])console.log((same(k)?'PASS ':'FAIL ')+k+' = '+JSON.stringify(after[k]));
- console.log((after.gotSprites===before.col.n?'PASS ':'FAIL ')+'collected stamps on map after reopen: '+after.gotSprites);
+ for(const k of ['watch','light','welcomeHidden','found'])console.log((same(k)?'PASS ':'FAIL ')+k+' = '+JSON.stringify(after[k]));
  // ---- different origin (like a custom domain) ----
  const p2=await ctx.newPage();await p2.goto('https://y.test/');await p2.waitForTimeout(2000);const other=await snap(p2);
- console.log('OTHER ORIGIN y.test sees: collected',other.col.n,'watch',other.watch.length,'keys',Object.keys(other.ls).length);
+ console.log('OTHER ORIGIN y.test sees: watch',other.watch.length,'keys',Object.keys(other.ls).length);
  // ---- clearing site data ----
  await pg.evaluate(()=>localStorage.clear());await pg.reload();await pg.waitForTimeout(2000);const cleared=await snap(pg);
- console.log('AFTER CLEARING SITE DATA: collected',cleared.col.n,'badges',cleared.badges.length,'watch',cleared.watch.length);
+ console.log('AFTER CLEARING SITE DATA: watch',cleared.watch.length);
  console.log('persist() granted?',await pg.evaluate(async()=>navigator.storage&&navigator.storage.persisted?await navigator.storage.persisted():'n/a'));
  await ctx.close();
 })();
