@@ -1,7 +1,9 @@
 """Daily refresh of Storeys data.
 BTO dates + delays: BTO HQ TOP tracker. BTO blocks/postal codes: OneMap.
 Condo launch + expected TOP: EdgeProp new-launch pages."""
-import json, re, time, html, urllib.parse, urllib.request, datetime, os
+import json, re, time, html, urllib.parse, urllib.request, datetime, os, sys
+sys.path.insert(0, os.path.dirname(__file__))
+import hdb
 
 UA = "Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/124 Safari/537.36"
 DATA = os.path.join(os.path.dirname(__file__), "..", "data.json")
@@ -137,12 +139,16 @@ for n in cand:
         m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', t, re.S)
         if not m:
             continue
-        t = m.group(1)
-        cd = re.search(r'"completion_date":"([^"]*)"', t)
-        ld = re.search(r'"launch_date_text":"([^"]*)"', t)
-        sa = re.search(r'"site_address":"([^"]*)"', t)
+        try:
+            det = json.loads(m.group(1))["props"]["pageProps"]["projectDetails"]["details"]
+        except Exception:
+            continue
+        det = det if isinstance(det, list) else [det]
+        def field(k):  # this project's own value only (related projects on the page are ignored)
+            return next((str(x.get(k)) for x in det if isinstance(x, dict) and x.get(k)), "")
+        cd, ld, sa = field("completion_date"), field("launch_date_text"), field("site_address")
         if cd or ld:
-            got = (cd.group(1) if cd else "", ld.group(1)[:7] if ld else "", sa.group(1) if sa else "")
+            got = (cd, ld[:7], sa)
             break
         time.sleep(0.3)
     if not got:
@@ -170,6 +176,18 @@ if bto is not old["bto"]:
     checked["bto"] = now_sg
 if condo is not old["condo"]:
     checked["condo"] = now_sg
-out = {"updated": now_sg, "checked": checked, "bto": bto, "condo": condo}
+# ---------- Official completions: HDB's own list of completed blocks ----------
+hdb_done = old.get("hdb") or {}
+try:
+    rows = hdb.fetch(lambda u: json.loads(get(u) or "{}"))
+    if len(rows) > 10000:
+        hdb_done = hdb.completed(bto, rows)
+        checked["hdb"] = now_sg
+        print("HDB completed-block matches:", len(hdb_done))
+    else:
+        print("HDB list looks incomplete, keeping previous", len(rows))
+except Exception as e:
+    print("HDB check failed, keeping previous", e)
+out = {"updated": now_sg, "checked": checked, "bto": bto, "condo": condo, "hdb": hdb_done}
 json.dump(out, open(DATA, "w"), ensure_ascii=False, separators=(",", ":"))
 print("saved", len(bto), "BTO,", len(condo), "condos")

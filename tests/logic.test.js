@@ -7,7 +7,7 @@ const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
 const grab = re => { const m = html.match(re); if (!m) throw new Error("missing " + re); return m[0]; };
 const code = [
   grab(/const ym=s=>[^\n]*/), grab(/const months=[^\n]*/), grab(/const fmtYM=[^\n]*/),
-  grab(/function stats\(p\)\{[\s\S]*?\n\}/), grab(/function stageFor\(p\)[^\n]*/),
+  grab(/const topWhen=[^\n]*/), grab(/function stats\(p\)\{[\s\S]*?\n\}/), grab(/function stageFor\(p\)[^\n]*/),
   grab(/const PCT_WORDS=[^\n]*/), grab(/const pctShort=[^\n]*/), grab(/const dateLabel=[^\n]*/), grab(/const srcName=[^\n]*/),
   grab(/function verdict\(p,k\)\{[\s\S]*?\n\}/),
   grab(/function metres\(a,b\)[^\n]*/), grab(/function busiest\(\)\{[\s\S]*?return best\}/),
@@ -54,6 +54,13 @@ t("first visit lands on the busiest cluster", () => {
 t("map sprites and sheet art never draw a finished building from dates alone", () => {
   assert.ok(html.includes("done=!!isDone") && html.includes("done=!!p.done"));
   assert.ok(!stats(bto(ymOff(-50), ymOff(-1))).done);
+});
+t("HDB's completed-block list marks partial progress, never from dates", () => {
+  const p = { ...bto(ymOff(-50), ymOff(14)), part: { n: 3, of: 11, yr: 2026 } };
+  const k = stats(p), v = verdict(p, k);
+  assert.ok(!k.done && k.part.n === 3);
+  assert.match(v.t, /3 of 11 blocks completed/);
+  assert.match(pctShort(k), /3\/11/);
 });
 t("only a verified override marks a project complete", () => {
   const p = { ...bto(ymOff(-30), ymOff(18)), kind: "Condo", done: { top: ymOff(-1), keys: ymOff(0), how: "owners" } };

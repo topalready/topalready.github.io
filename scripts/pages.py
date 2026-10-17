@@ -32,6 +32,13 @@ try:
 except Exception:
     OVR = {}
 rows = [("BTO", r[0], r[2], r[3], r[4]) for r in d["bto"]] + [("Condo", r[0], r[1], r[2], "") for r in d["condo"]]
+HDB = d.get("hdb") or {}
+def fix(kind, name, launch, ecd, delayed):
+    o = OVR.get(f"{kind}:{name}") or {}
+    if o.get("launch"): launch = o["launch"]
+    if o.get("est"): ecd, delayed = o["est"], ""
+    return launch, ecd, delayed
+rows = [(k, n, *fix(k, n, l, e, dl)) for k, n, l, e, dl in rows]
 
 made = 0
 for kind, name, launch, ecd, delayed in rows:
@@ -43,10 +50,15 @@ for kind, name, launch, ecd, delayed in rows:
         desc = f"{pct}% of the estimated timeline has elapsed (a time-based estimate, not measured progress). {'Est. completion' if kind == 'BTO' else 'Expected TOP'}: {fmt(T)}. Satellite photos since 2012 and real site photos from people nearby. No ads."
     else:
         desc = f"Expected {'completion' if kind == 'BTO' else 'TOP'}: {fmt(T)}. Satellite photos since 2012 and real site photos from people nearby. No ads."
-    done = OVR.get(f"{kind}:{name}")
+    done = OVR.get(f"{kind}:{name}") if OVR.get(f"{kind}:{name}", {}).get("top") else None
+    h = HDB.get(name) if kind == "BTO" else None
+    if h and not done and h[0] >= h[1]:
+        done = {"top": f"{h[2]}-12", "how": "HDB's official list of completed blocks"}
     if done:
         T, pct = ym(done["top"]), 100
-        desc = f"TOP obtained: reported {fmt(T)}" + (f", key collection from {fmt(ym(done['keys']))}" if done.get("keys") else "") + ". Satellite photos since 2012 and real site photos from people nearby. No ads."
+        desc = (f"Completed: HDB lists all blocks as done ({T.year})" if "HDB" in done.get("how", "") else f"TOP obtained: reported {fmt(T)}") + (f", key collection from {fmt(ym(done['keys']))}" if done.get("keys") else "") + ". Satellite photos since 2012 and real site photos from people nearby. No ads."
+    if h and not done and h[0] < h[1]:
+        desc = f"{h[0]} of {h[1]} blocks completed, per HDB's official list. Est. completion: {fmt(T)}. Satellite photos since 2012 and real site photos from people nearby. No ads."
     title = f"{name} ({kind}) · {APP}"
     url = f"{SITE}p/{s}/"
     e = html.escape
@@ -54,7 +66,7 @@ for kind, name, launch, ecd, delayed in rows:
     img = f"{SITE}icon-512.png"
     if card:
         try:
-            card(os.path.join(ROOT, "p", s, "card.png"), name, kind, pct, f"TOP obtained: {fmt(T)}" if done else f"{'Est. completion' if kind == 'BTO' else 'Expected TOP'}: {fmt(T)}", done=done or False)
+            card(os.path.join(ROOT, "p", s, "card.png"), name, kind, pct, (f"Completed: {T.year} (HDB)" if "HDB" in done.get("how", "") else f"TOP obtained: {fmt(T)}") if done else f"{'Est. completion' if kind == 'BTO' else 'Expected TOP'}: {fmt(T)}", done=done or False)
             img = f"{url}card.png"
         except Exception as e:
             print("card failed", name, e)

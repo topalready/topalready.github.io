@@ -640,28 +640,33 @@ function search(q){
 }
 
 /* ---------- Progress ---------- */
-function stats(p){
+const topWhen=k=>k.yearOnly?String(k.T.getFullYear()):fmtYM(k.T);
+function stats(p){const k=stats0(p);if(p.part&&!k.done)k.part=p.part;return k}
+function stats0(p){
   const L=ym(p.launch),E=ym(p.ecd),T=ym(p.delayed||p.ecd),now=new Date();
-  if(p.done)return{L,E,T:ym(p.done.top)||T,pct:100,rate:null,left:0,delay:0,done:true};
+  if(p.done)return{L,E,T:ym(p.done.top.length===4?p.done.top+"-12":p.done.top)||T,pct:100,rate:null,left:0,delay:0,done:true,yearOnly:p.done.top.length===4,est:T};
   if(!L)return{L,E,T,pct:null,rate:null,left:T?Math.max(0,Math.round(months(now,T))):null,delay:0};
   const total=months(L,T);
   return{L,E,T,pct:Math.max(0,Math.min(100,months(L,now)/total*100)),rate:100/total,left:Math.max(0,Math.round(months(now,T))),delay:p.delayed?Math.round(months(E,T)):0};
 }
 function stageFor(p){return p==null?"Not launched":p<12?"Piling and foundations":p<70?"Structure going up":p<92?"Facade and fit-out":p<100?"Final works":"Estimated date reached"}
 const PCT_WORDS="of estimated timeline elapsed";
-const pctShort=k=>k.done?"TOP ✓":k.pct==null?"Not launched":Math.round(k.pct)+"%";
+const pctShort=k=>k.done?"TOP ✓":k.part?`${k.part.n}/${k.part.of} blocks`:k.pct==null?"Not launched":Math.round(k.pct)+"%";
 const dateLabel=p=>p.kind==="BTO"?"Est. completion":"Expected TOP";
 const srcName=p=>p.kind==="BTO"?"HDB's estimate":"the developer's estimate";
 let DATAINFO={updated:"",checked:{}};
 function verdict(p,k){
-  if(k.done){const o=p.done;return{cls:"ahead",t:"TOP obtained",d:`TOP reported in ${fmtYM(ym(o.top))}${o.keys?`, with key collection from ${fmtYM(ym(o.keys))}`:""}. Based on ${o.how||"reports"}${o.src?"":""}. ${p.kind==="BTO"?"HDB's":"The developer's"} listing still showed ${fmtYM(k.E)}, which is often the latest allowed date.`}}
+  if(k.done){const o=p.done;
+    if(o.hdb)return{cls:"ahead",t:"Completed",d:`HDB's official building list shows all ${o.nb} blocks completed (latest in ${o.top}). Key collection usually starts soon after. The estimate we had was ${fmtYM(k.est||k.E)}.`};
+    return{cls:"ahead",t:"TOP obtained",d:`TOP reported in ${topWhen(k)}${o.keys?`, with key collection from ${fmtYM(ym(o.keys))}`:""}. Based on ${o.how||"reports"}. ${p.kind==="BTO"?"HDB's":"The developer's"} listing showed ${fmtYM(k.est||k.E)}, which is often the latest allowed date.`}}
+  if(k.part)return{cls:"ahead",t:`${k.part.n} of ${k.part.of} blocks completed`,d:`HDB's official building list shows ${k.part.n} of this project's ${k.part.of} blocks completed (latest in ${k.part.yr}). The rest should follow, and key collection usually starts soon after a block is done. Estimated completion for the whole project: ${fmtYM(k.T)}.`};
   if(k.pct==null)return{cls:"",t:"Not launched yet",d:`${dateLabel(p)} ${fmtYM(k.T)}. The timeline starts once it launches.`};
   if(k.pct>=100)return{cls:"",t:"Estimated date reached",d:`${p.kind==="BTO"?"HDB's estimated completion date":"The developer's expected TOP date"} (${fmtYM(k.T)}) has arrived. We have no confirmation that it is complete or that keys are being handed over. Check with ${p.kind==="BTO"?"HDB":"the developer"}.`};
   if(k.delay>=1){
     const why=p.remark?p.remark.replace(/\s*\d{4}-\d{2}-\d{2}$/,"").replace("Covid19:","Covid-19:").replace(/month(s)?\(s\)/,"months")+".":"";
     return{cls:"behind",t:`Delay announced: about ${k.delay} months`,d:`Launched with completion estimated for ${fmtYM(k.E)}, now ${fmtYM(k.T)}. ${why}`};
   }
-  return{cls:"ahead",t:"No delay announced",d:p.kind==="BTO"?`HDB still estimates completion in ${fmtYM(k.T)}.`:`Developer's expected TOP is ${fmtYM(k.T)}. Listed dates are often the latest allowed, so many condos finish earlier, and developers don't always announce delays.`};
+  return{cls:"ahead",t:"No delay announced",d:p.kind==="BTO"?`HDB still estimates completion in ${fmtYM(k.T)}.`:`${p.corr&&p.corr.est?"Expected TOP":"Developer's expected TOP"} is ${fmtYM(k.T)}. Listed dates are often the latest allowed, so many condos finish earlier, and developers don't always announce delays.`};
 }
 
 /* ---------- Illustration ---------- */
@@ -822,17 +827,17 @@ function card(p){
   <div class="scene" data-pct="${k.pct||0}">${building(k.pct,p.name,k.done)}<span class="artnote">${k.done?"Illustration: TOP reported":"Illustration of the estimated timeline"}</span></div>
   <div class="body">
     <h2>${esc(p.name)}<span class="tag ${p.kind}">${p.kind}</span></h2><p class="addr">${esc(where)}</p>
-    <div class="storey"><span class="num">${k.done?"TOP":k.pct==null?"—":Math.round(k.pct)+"%"}</span><span>${k.done?"obtained, "+fmtYM(k.T):k.pct==null?"timeline starts at launch":PCT_WORDS}</span></div>
-    <div class="bar"><i style="width:${k.pct||0}%"></i></div>
-    <p class="explain">${k.done?`Marked complete from ${esc(p.done.how||"reports")}${p.done.src?` (<a href="${esc(p.done.src)}" target="_blank" rel="noopener">source</a>)`:""}.`:`Time since launch, as a share of the time to ${srcName(p)} of completion. It doesn't measure work on site.`}</p>
+    <div class="storey"><span class="num">${k.done?(p.done.hdb?"Done":"TOP"):k.part?`${k.part.n}/${k.part.of}`:k.pct==null?"—":Math.round(k.pct)+"%"}</span><span>${k.done?(p.done.hdb?"completed, "+topWhen(k):"obtained, "+topWhen(k)):k.part?"blocks completed (HDB)":k.pct==null?"timeline starts at launch":PCT_WORDS}</span></div>
+    <div class="bar"><i style="width:${k.part?Math.round(k.part.n/k.part.of*100):k.pct||0}%"></i></div>
+    <p class="explain">${k.part?`From <a href="${HDBSRC}" target="_blank" rel="noopener">HDB's official list of completed blocks</a>, checked daily.`:k.done?`Marked complete from ${esc(p.done.how||"reports")}${p.done.src?` (<a href="${esc(p.done.src)}" target="_blank" rel="noopener">source</a>)`:""}.`:`Time since launch, as a share of the time to ${srcName(p)} of completion. It doesn't measure work on site.`}</p>
     <div class="built" data-built="${esc(p.key)}">${builtHTML(p)}</div>
     <div class="verdict ${v.cls}"><b>${esc(v.t)}</b>${esc(v.d)}</div>
     ${p.ll?`<div class="aerial" data-aerial="${esc(p.key)}"><h3>From above</h3><p class="note">Satellite photos of this exact spot over the years. Drag back to see it before construction.</p><div class="abody"><p class="note">Loading satellite photos…</p></div></div>`:""}
     <div class="facts">
       <div>Launched<b>${fmtYM(k.L)}</b></div>
-      <div>${k.done?"TOP obtained":dateLabel(p)}<b>${fmtYM(k.T)}</b></div>
+      <div>${k.done?(p.done.hdb?"Completed":"TOP obtained"):dateLabel(p)}<b>${k.done?topWhen(k):fmtYM(k.T)}</b></div>
       <div>Until that date<b>${k.done?"Done":k.pct==null?"—":k.pct>=100?"Date passed":k.left?"~"+k.left+" months":"Under a month"}</b></div>
-      <div>Typical stage by now<b>${k.done?"Completed":stageFor(k.pct)}</b><small>${k.done?"TOP reported, see above":"General guide, not verified"}</small></div>
+      <div>Typical stage by now<b>${k.done?"Completed":stageFor(k.pct)}</b><small>${k.done?"See above":"General guide, not verified"}</small></div>
     </div>
     <button type="button" class="add sharebtn" data-share="${esc(p.key)}"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>Share progress card</button>
     ${sourcesHTML(p)}
@@ -860,6 +865,8 @@ function sourcesHTML(p){
   return `<details class="sources"><summary>Where these numbers come from</summary><dl>
     <dt>Estimated dates</dt><dd>${p.kind==="BTO"?"HDB's estimated completion and any announced delays, as compiled by BTO HQ.":"The developer's expected TOP, from its EdgeProp new-launch listing."}</dd>
     <dt>${ck?"Last successful check":"Last data refresh"}</dt><dd>${fmtCheck(ck||DATAINFO.updated)||"Unknown"}${stale?" (the source couldn't be read since then, so this may be out of date)":""}. We check daily; the source doesn't say when it last changed these dates.</dd>
+    ${p.corr&&(p.corr.est||p.corr.launch)?`<dt>Corrected by us</dt><dd>${p.corr.launch?`Launch date set to ${fmtYM(ym(p.corr.launch))}. `:""}${p.corr.est?`Expected TOP set to ${fmtYM(ym(p.corr.est))}${p.srcEst?` (the listing said ${fmtYM(ym(p.srcEst))})`:""}. `:""}${esc((p.corr.how||"").replace(/^./,c=>c.toUpperCase()))}. ${p.corr.src?`<a href="${esc(p.corr.src)}" target="_blank" rel="noopener">Source</a>`:""}</dd>`:""}
+    ${p.kind==="BTO"?`<dt>Completed blocks</dt><dd>${p.part?`${p.part.n} of ${p.part.of}`:p.done&&p.done.hdb?"All":"None yet"}, from <a href="${HDBSRC}" target="_blank" rel="noopener">HDB's official building list</a>${DATAINFO.checked.hdb?`, checked ${fmtCheck(DATAINFO.checked.hdb)}`:""}.</dd>`:""}
     <dt>Timeline %</dt><dd>Worked out by TOP Already? from the launch date and estimated date. Not an official figure.</dd>
     <dt>Verified milestones</dt><dd>None published for this project.</dd>
     <dt>Site photos</dt><dd>Shared by people near the site. Not checked by ${p.kind==="BTO"?"HDB":"the developer"}.</dd>
@@ -1515,12 +1522,15 @@ q.addEventListener("keydown",e=>{if(e.key==="Enter"){const b=sug.querySelector("
 sug.addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b)choose(+b.dataset.i)});
 
 /* ---------- Load data ---------- */
-let OVR={};const ovrReady=fetch("overrides.json?"+Date.now()).then(r=>r.ok?r.json():{}).then(o=>OVR=o||{}).catch(()=>{});
+const HDBSRC="https://data.gov.sg/datasets/d_17f5382f26140b1fdae0ba2ef6239d2f/view";let OVR={};const ovrReady=fetch("overrides.json?"+Date.now()).then(r=>r.ok?r.json():{}).then(o=>OVR=o||{}).catch(()=>{});
 fetch("data.json?"+Date.now()).then(r=>r.json()).then(async D=>{await ovrReady;
   DATAINFO={updated:D.updated||"",checked:D.checked||{}};$("#upd").textContent=D.updated;
   D.bto.forEach(r=>P.push({kind:"BTO",name:r[0],launch:r[2],ecd:r[3],delayed:r[4],remark:r[5],roads:r[6]?r[6].split("|"):[],blks:r[7]?r[7].split(" "):[],postals:r[8]?r[8].split(" "):[],ll:r[9]||null,addr:""}));
   D.condo.forEach(r=>P.push({kind:"Condo",name:r[0],launch:r[1],ecd:r[2],delayed:"",remark:"",roads:[],blks:[],postals:(r[3].match(/\b\d{6}\b/g)||[]),addr:r[3],ll:r[4]||null}));
-  P.forEach((p,i)=>{p.i=i;p.key=p.kind+":"+p.name+":"+p.launch;p.done=OVR[p.kind+":"+p.name]||null;p.nn=norm(p.name);p.na=norm(p.addr+" "+p.roads.join(" "))});
+  P.forEach((p,i)=>{p.i=i;p.key=p.kind+":"+p.name+":"+p.launch;const o=OVR[p.kind+":"+p.name];p.corr=o||null;p.done=null;p.part=null;
+    if(o){if(o.launch)p.launch=o.launch;if(o.est){p.srcEst=p.ecd;p.ecd=o.est;p.delayed=""}if(o.top)p.done=o}
+    const h=p.kind==="BTO"&&(D.hdb||{})[p.name];
+    if(h&&!p.done){if(h[0]>=h[1])p.done={top:String(h[2]),how:`HDB's official list of completed blocks (all ${h[1]} blocks)`,src:HDBSRC,hdb:true,nb:h[1]};else p.part={n:h[0],of:h[1],yr:h[2]}}p.nn=norm(p.name);p.na=norm(p.addr+" "+p.roads.join(" "))});
   render();explore();badge();initMap();applyLight(false);loadFeed();loadStatus();$("#tipslot").innerHTML=tipHTML(true);
   try{if(!sessionStorage.getItem("storeys.v")){sessionStorage.setItem("storeys.v","1");track("visit")}}catch(e){track("visit")}
   const want=new URLSearchParams(location.search).get("p"),wp=want&&P.find(q=>slug(q.name)===want);
