@@ -76,6 +76,7 @@ input:focus-visible,button:focus-visible,a:focus-visible,label:focus-within{outl
 .photos{border-top:3px dashed color-mix(in srgb,var(--edge) 30%,transparent);margin-top:18px;padding-top:16px}
 .photos h3{font-size:1.2rem;margin:0 0 4px}
 .album{margin:6px 0 4px}
+.fromabove{margin:14px 0 0;font-size:.88rem;color:var(--muted)}.fromabove a{color:var(--ink);font-weight:600}.fromabove small{display:block;font-size:.75rem;margin-top:2px}
 .month{margin:0 0 6px}
 .month h4{margin:10px 0 0;font-size:.85rem;font-weight:700;color:var(--ink);display:flex;align-items:baseline;gap:8px}
 .month h4 small{font-weight:500;color:var(--muted);font-size:.75rem}
@@ -824,6 +825,7 @@ function card(p){
       <button class="ghost" type="button" data-copy="${p.i}">Copy link</button>
       <button class="ghost" type="button" data-watch-toggle="${p.i}">${tracked.includes(p.key)?"Stop watching":"Watch this"}</button>
     </div>
+    ${p.ll?`<p class="fromabove">🛰️ See it from above: <a href="https://livingatlas.arcgis.com/wayback/#mapCenter=${p.ll[1].toFixed(5)}%2C${p.ll[0].toFixed(5)}%2C17&mode=explore" target="_blank" rel="noopener">satellite history</a> · <a href="https://earth.google.com/web/@${p.ll[0].toFixed(5)},${p.ll[1].toFixed(5)},40a,700d,35y,0h,0t,0r" target="_blank" rel="noopener">Google Earth</a><small>Satellite photos of Singapore are only updated every year or two, so they show the bigger picture, not this month.</small></p>`:""}
     ${tipHTML(false)}
   </div></section>`;
 }
