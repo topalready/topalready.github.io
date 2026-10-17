@@ -75,8 +75,25 @@ input:focus-visible,button:focus-visible,a:focus-visible,label:focus-within{outl
 .note{font-size:.88rem;color:var(--muted);margin:0}
 .photos{border-top:3px dashed color-mix(in srgb,var(--edge) 30%,transparent);margin-top:18px;padding-top:16px}
 .photos h3{font-size:1.2rem;margin:0 0 4px}
+.aerial{border-top:3px dashed color-mix(in srgb,var(--edge) 30%,transparent);margin-top:18px;padding-top:16px}
+.aerial h3{font-size:1.2rem;margin:0 0 4px}
+.aview{position:relative;aspect-ratio:1;border-radius:18px;overflow:hidden;background:#2B3A33;margin-top:8px}
+.aworld{position:absolute;width:768px;height:768px}
+.aframe{position:absolute;inset:0;transition:opacity .45s ease}
+.aframe img{position:absolute;width:256px;height:256px;display:block}
+.apin{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid #FFD36E;box-shadow:0 0 0 2px rgba(0,0,0,.35),inset 0 0 0 2px rgba(0,0,0,.25);pointer-events:none}
+.acap{position:absolute;left:10px;top:10px;padding:6px 12px;border-radius:12px;background:rgba(30,24,20,.72);color:#fff;font-size:.78rem}
+.acap b{display:block;font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:1.15rem}
+.acap span:empty{display:none}
+.actl{display:flex;align-items:center;gap:12px;margin:12px 0 4px}
+.aplay{flex:0 0 auto;width:44px;height:44px;border-radius:50%;border:0;background:var(--crane);color:#3A2C26;font-size:1rem;cursor:pointer}
+.atrack{flex:1;position:relative;padding-bottom:20px}
+.aslide{width:100%;margin:0;accent-color:var(--crane);height:28px}
+.aticks{position:absolute;left:10px;right:10px;bottom:0;height:16px}
+.aticks span{position:absolute;transform:translateX(-50%);font-size:.7rem;font-weight:600;color:var(--muted)}
+.acredit{font-size:.72rem;color:var(--muted);margin:6px 0 0}.acredit a{color:inherit}
+@media (prefers-reduced-motion:reduce){.aframe{transition:none}}
 .album{margin:6px 0 4px}
-.fromabove{margin:14px 0 0;font-size:.88rem;color:var(--muted)}.fromabove a{color:var(--ink);font-weight:600}.fromabove small{display:block;font-size:.75rem;margin-top:2px}
 .month{margin:0 0 6px}
 .month h4{margin:10px 0 0;font-size:.85rem;font-weight:700;color:var(--ink);display:flex;align-items:baseline;gap:8px}
 .month h4 small{font-weight:500;color:var(--muted);font-size:.75rem}
@@ -820,12 +837,12 @@ function card(p){
       <p class="note howto">You need to be within 800 m of the site, using a photo from the last 14 days. We read the location saved in the photo, or ask for yours if there isn't one. Your exact location isn't stored. Photos appear for everyone straight away and can be reported. Shoot the building, not faces or homes. <a href="privacy.html">Photo rules</a></p>`:`<p class="note">Photo uploads open once this site is on the map.</p>`}
       <p class="status" role="status"></p>
     </div>
+    ${p.ll?`<div class="aerial" data-aerial="${esc(p.key)}"><h3>From above</h3><p class="note">Satellite photos of this exact spot over the years. Drag back to see it before construction.</p><div class="abody"><p class="note">Loading satellite photos…</p></div></div>`:""}
     <div class="row">
       ${p.ll?`<button class="maplink" type="button" data-fly="${p.i}">Fly there on the map</button>`:""}
       <button class="ghost" type="button" data-copy="${p.i}">Copy link</button>
       <button class="ghost" type="button" data-watch-toggle="${p.i}">${tracked.includes(p.key)?"Stop watching":"Watch this"}</button>
     </div>
-    ${p.ll?`<p class="fromabove">🛰️ See it from above: <a href="https://livingatlas.arcgis.com/wayback/#mapCenter=${p.ll[1].toFixed(5)}%2C${p.ll[0].toFixed(5)}%2C17&mode=explore" target="_blank" rel="noopener">satellite history</a> · <a href="https://earth.google.com/web/@${p.ll[0].toFixed(5)},${p.ll[1].toFixed(5)},40a,700d,35y,0h,0t,0r" target="_blank" rel="noopener">Google Earth</a><small>Satellite photos of Singapore are only updated every year or two, so they show the bigger picture, not this month.</small></p>`:""}
     ${tipHTML(false)}
   </div></section>`;
 }
@@ -948,6 +965,36 @@ $("#wanted").addEventListener("click",e=>{const c=e.target.closest(".chip");if(!
 $("#cheerok").addEventListener("click",()=>{$("#cheer").hidden=true});
 $("#cheer").addEventListener("click",e=>{if(e.target.id==="cheer")$("#cheer").hidden=true});
 
+
+/* ---------- From above: dated satellite photos (Esri World Imagery Wayback, loaded live) ---------- */
+let AERIAL=null,APLAY=null;
+const WB="https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/";
+const WBAPP=ll=>`https://livingatlas.arcgis.com/wayback/#mapCenter=${ll[1].toFixed(5)}%2C${ll[0].toFixed(5)}%2C17&mode=explore`;
+async function loadAerial(p){
+  if(!p.ll)return;
+  if(!AERIAL){try{const r=await fetch("aerial.json",{cache:"no-cache"});AERIAL=r.ok?await r.json():{sites:{}}}catch(e){AERIAL={sites:{}}}}
+  const box=[...document.querySelectorAll(".aerial")].find(b=>b.dataset.aerial===p.key);if(!box)return;
+  const frames=(AERIAL.sites[p.ll[0].toFixed(4)+","+p.ll[1].toFixed(4)]||[]).slice().reverse(); // oldest first
+  const body=box.querySelector(".abody");
+  if(frames.length<2){body.innerHTML=`<p class="note">No satellite history for this spot yet. <a href="${WBAPP(p.ll)}" target="_blank" rel="noopener">Look around in Esri Wayback</a>.</p>`;return}
+  const Z=18,n=2**Z,fx=(p.ll[1]+180)/360*n,fy=(1-Math.asinh(Math.tan(p.ll[0]*Math.PI/180))/Math.PI)/2*n;
+  const x0=Math.floor(fx)-1,y0=Math.floor(fy)-1,ox=(fx-x0)*256,oy=(fy-y0)*256;
+  const launch=stats(p).L;
+  const label=d=>new Date(d).toLocaleDateString("en-SG",{month:"short",year:"numeric"});
+  const rel=d=>{if(!launch)return"";const m=Math.round((new Date(d)-launch)/2629746e3);if(m<-1){const y=Math.round(-m/12);return m<=-12?`${y} yr${y>1?"s":""} before launch`:`${-m} months before launch`}if(m<=1)return"Around launch";return m>=12?`${(m/12).toFixed(m%12?1:0).replace(".0","")} yrs after launch`:`${m} months after launch`};
+  body.innerHTML=`<div class="aview" role="img" aria-label="Satellite photo of the site"><div class="aworld" style="left:calc(50% - ${ox.toFixed(1)}px);top:calc(50% - ${oy.toFixed(1)}px)">${frames.map(([r],i)=>`<div class="aframe" data-f="${i}"${i===frames.length-1?"":' style="opacity:0"'}></div>`).join("")}</div><span class="apin" aria-hidden="true"></span><div class="acap"><b class="adate"></b><span class="arel"></span></div></div>
+   <div class="actl"><button type="button" class="aplay" aria-label="Play through the years">▶</button><div class="atrack"><input type="range" class="aslide" min="0" max="${frames.length-1}" step="1" value="${frames.length-1}" aria-label="Satellite photo date"><div class="aticks">${(()=>{let last=-1;return frames.map(([,d],i)=>{const x=i/(frames.length-1)*100,show=i===frames.length-1||last<0||x-last>=14;if(i===frames.length-1&&last>=0&&x-last<14)return"";if(!show)return"";last=x;return `<span style="left:${x.toFixed(2)}%">${d.slice(0,4)}</span>`}).join("")})()}</div></div></div>
+   <p class="acredit">Imagery: Esri, Vantor, Earthstar Geographics, via <a href="${WBAPP(p.ll)}" target="_blank" rel="noopener">World Imagery Wayback</a>. Singapore is usually re-photographed every year or two, so the newest frame may be months old.</p>`;
+  const fill=i=>{const f=body.querySelector(`.aframe[data-f="${i}"]`);if(!f||f.dataset.ok)return;f.dataset.ok=1;let h="";for(let dy=0;dy<3;dy++)for(let dx=0;dx<3;dx++)h+=`<img alt="" decoding="async" src="${WB}${frames[i][0]}/${Z}/${y0+dy}/${x0+dx}" style="left:${dx*256}px;top:${dy*256}px">`;f.innerHTML=h};
+  const sl=body.querySelector(".aslide");
+  const show=i=>{fill(i);body.querySelectorAll(".aframe").forEach(f=>f.style.opacity=+f.dataset.f===i?1:0);const d=frames[i][1];body.querySelector(".adate").textContent=label(d);body.querySelector(".arel").textContent=rel(d);sl.value=i;sl.setAttribute("aria-valuetext",label(d)+(rel(d)?", "+rel(d):""));fill(i-1);fill(i+1)};
+  sl.addEventListener("input",()=>{stopPlay();show(+sl.value)});
+  const btn=body.querySelector(".aplay");
+  function stopPlay(){if(APLAY){clearInterval(APLAY);APLAY=null}btn.textContent="▶";btn.setAttribute("aria-label","Play through the years")}
+  btn.addEventListener("click",()=>{if(APLAY)return stopPlay();frames.forEach((_,i)=>fill(i));let i=+sl.value>=frames.length-1?0:+sl.value;show(i);btn.textContent="❚❚";btn.setAttribute("aria-label","Pause");APLAY=setInterval(()=>{i++;if(i>=frames.length)return stopPlay();show(i)},1100)});
+  show(frames.length-1);
+  setTimeout(()=>frames.forEach((_,i)=>fill(i)),1500);
+}
 /* ---------- Photos: EXIF (date + GPS) ---------- */
 function readExif(buf){
   const v=new DataView(buf);
@@ -1256,9 +1303,10 @@ function sheetShown(url){
 function openSheet(i){
   const p=P[i];if(!p)return;SHEETKEY=p.key;
   hideWelcome();track("open",p.key);
-  $("#sheetbody").innerHTML=card(p);sheetShown("?p="+slug(p.name));loadPhotos(p.key);
+  $("#sheetbody").innerHTML=card(p);sheetShown("?p="+slug(p.name));loadPhotos(p.key);loadAerial(p);
 }
 function closeSheet(fromBack){
+  if(APLAY){clearInterval(APLAY);APLAY=null}
   if($("#sheet").hidden&&!SHEETHIST)return;
   $("#sheet").hidden=true;$("#sheetbody").innerHTML="";SHEETKEY=null;
   if(SHEETHIST){SHEETHIST=false;if(fromBack!==true){IGNOREPOP=true;try{history.back()}catch(e){IGNOREPOP=false}}}
