@@ -106,5 +106,23 @@
     "how": "launched Oct 2025",
     "src": "https://www.edgeprop.sg/property-news/uol-sells-99-skye-holland-average-2953-psf",
     "checked": "2026-10-17"
+  },
+  "BTO:Bartley GreenRise": {
+    "top": "2026-01",
+    "how": "HDB announced on 7 Jan 2026 that Bartley GreenRise, one of the final four Bidadari BTO projects, is completed",
+    "src": "https://www.hdb.gov.sg/hdb-pulse/news/2026/final-four-projects-in-bidadari-completed",
+    "checked": "2026-10-18"
+  },
+  "Condo:The Serra Residences": {
+    "launch": "2026-10", "est": "2030-12",
+    "how": "Far East Organization: launched 16 Oct 2026, expected TOP Q4 2030 (also reported by EdgeProp)",
+    "src": "https://www.malaymail.com/news/money/mediaoutreach/2026/10/02/far-east-organization-unveils-the-serra-residences/491458",
+    "checked": "2026-10-18"
+  },
+  "Condo:Sophia Meadow": {
+    "est": "2029-11",
+    "how": "expected TOP Nov 2029 (vacant possession 30 Nov 2029 per propertynet.sg); the Q1 2027 date was a placeholder",
+    "src": "https://www.newlaunchesreview.com/sophia-meadows/",
+    "checked": "2026-10-18"
   }
 }
