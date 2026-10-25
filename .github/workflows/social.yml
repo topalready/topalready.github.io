@@ -1,0 +1,37 @@
+name: Build Instagram posts
+on:
+  schedule:
+    - cron: "0 1 * * 0"   # Sunday 9am Singapore time, weekly
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Include community photos from the last N days"
+        default: "7"
+permissions:
+  contents: write
+  actions: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install tools
+        run: |
+          pip install --quiet pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Build this week's posts
+        run: python scripts/social.py "${{ github.event.inputs.days || '7' }}"
+      - name: Save posts
+        run: |
+          git config user.name "storeys-bot"
+          git config user.email "storeys-bot@users.noreply.github.com"
+          git pull --rebase --quiet || true
+          git add social
+          git diff --cached --quiet || (git commit -m "Weekly social posts [data]" && git push)
+      - name: Publish to the site so images get public links
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run update.yml --ref main
