@@ -97,7 +97,7 @@ p.sub{{font:500 36px/1.38 G;color:#5E564A;margin-top:24px;max-width:860px}}
 def page(body, n, total, blob=True):
     dots = '<div class="dots">' + "".join(f'<span class="{"on" if i == n else ""}"></span>' for i in range(total)) + "</div>"
     b = '<div class="blob" style="width:620px;height:620px;right:-220px;bottom:-200px"></div>' if blob else ""
-    return f"<html><head><style>{CSS}</style></head><body>{b}{body}<div class='foot'><span>TOP Already?</span>{dots}</div></body></html>"
+    return f"<html><head><meta charset='utf-8'><style>{CSS}</style></head><body>{b}{body}<div class='foot'><span>TOP Already?</span>{dots}</div></body></html>"
 
 
 def phone(shot, x, y, rot=0, w=430, h=930):
@@ -122,14 +122,14 @@ def photos_post(photos):
     for i, p in enumerate(shown, 1):
         kind, name = project(p["project_key"])
         slides.append(page(f"""<div class="photo"><img src="{uri(p['img'])}"></div>
-            <div class="pill">📸 {day(p['taken_at'])}</div>
-            <div class="cap"><h3>{name}</h3><p>{kind} · snapped by someone passing by</p></div>""", i, total, blob=False))
+            <div class="pill">Snapped {day(p['taken_at'])}</div>
+            <div class="cap"><h3>{name}</h3><p>{kind} &middot; by someone passing by</p></div>""", i, total, blob=False))
     slides.append(page(f"""<div class="pad" style="text-align:center;padding-top:250px"><span class="tag">Your turn</span>
         <h1 style="font-size:84px">Passing a site?<br><span class="amber">Snap it.</span></h1>
         <p class="sub" style="margin:30px auto 0">Every photo joins that project's month-by-month album. No account needed.</p>
         <div class="btn">topalready.github.io</div></div>""", total - 1, total))
     caption = (f"Fresh from the sites 📸\n\n{len(shown)} candid snap{'s' if len(shown) != 1 else ''} from people passing "
-               f"{', '.join(names)} this week.\n\nWaiting for your BTO or condo? See its month-by-month photo album, "
+               f"{', '.join(names)} lately.\n\nWaiting for your BTO or condo? See its month-by-month photo album, "
                f"and if you pass a site, add a photo so everyone waiting can see how it's really going.\n\n"
                f"No ads. No login. 🔗 topalready.github.io (link in bio)\n\n{TAGS}")
     return {"id": "fresh_photos", "title": "Fresh from the sites", "slides": slides, "caption": caption}
