@@ -54,6 +54,10 @@ const log=(...a)=>console.log(...a);
   check(/Where these numbers come from/.test(s1.txt),`[${w}] sources box present`);
   await pg.evaluate(()=>{$('.sources').open=true;$('.sources').scrollIntoView()});await pg.waitForTimeout(200);await pg.screenshot({path:shots+`sources-${w}.png`});
   await pg.evaluate(()=>$('.photos').scrollIntoView());await pg.waitForTimeout(200);await pg.screenshot({path:shots+`photos-${w}.png`});
+  await pg.click('.photos .strip button[data-show="3"]');await pg.waitForTimeout(300);
+  const lbx=await pg.evaluate(()=>({open:!$('#lb').hidden,idx:LB&&LB.idx}));
+  check(lbx.open&&lbx.idx===3,`[${w}] tapping an album thumbnail opens that photo full screen`);
+  await pg.click('#lbclose');await pg.waitForTimeout(200);check(await pg.evaluate(()=>$('#lb').hidden&&!$('#sheet').hidden),`[${w}] closing the big photo returns to the project`);
   // watch + back button
   await pg.click('[data-watch-toggle]');await pg.goBack();await pg.waitForTimeout(400);
   const s2=await pg.evaluate(()=>({open:!$('#sheet').hidden,url:location.href}));

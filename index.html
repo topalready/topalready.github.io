@@ -1405,7 +1405,7 @@ $("#sheet").addEventListener("click",e=>{
   const cp=e.target.closest("[data-copy]");if(cp)return copyLink(P[+cp.dataset.copy],cp);
   const sh=e.target.closest("[data-share]");if(sh)return openShare(sh.dataset.share,sh);
   const lb=e.target.closest("[data-lb]");if(lb){const k=lb.dataset.k;const list=(cache[k]||[]).map(x=>({...x,key:k}));return openLightbox(list,+lb.dataset.lb,false)}
-  const s=e.target.closest("[data-show]");if(s)return showPhotos(s.dataset.k,+s.dataset.show);
+  const s=e.target.closest("[data-show]");if(s){const k=s.dataset.k,i=+s.dataset.show;showPhotos(k,i);return openLightbox((cache[k]||[]).map(x=>({...x,key:k})),i,false)}
   const rp=e.target.closest("[data-report]");if(rp)report(rp.dataset.report,rp.dataset.k,rp);
 });
 $("#sheet").addEventListener("change",e=>{if(e.target.matches("[data-up]"))upload(e.target)});
