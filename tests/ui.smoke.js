@@ -15,6 +15,7 @@ async function page(b,{w=390,h=844,reduce=false,dataFail=false,sbFail=false,geo=
     if(u.includes('openfreemap'))return r.fulfill({status:404,body:''});
     if(u.startsWith('https://fonts.googleapis.com/css2')){let css='';for(const [f,ws] of [['Fraunces',[400,500,600]],['Figtree',[400,500,600]]])for(const w2 of ws)css+=`@font-face{font-family:'${f}';font-weight:${w2};src:url(https://fontfile.test/${f.toLowerCase()}-latin-${w2}-normal.woff2) format('woff2')}`;return r.fulfill({body:css,contentType:'text/css'})}
     if(u.startsWith('https://fontfile.test/')){const n=u.split('/').pop();return r.fulfill({body:fs.readFileSync(`node_modules/@fontsource/${n.split('-')[0]}/files/${n}`),contentType:'font/woff2'})}
+    if(u.startsWith('https://x.test/aerial.json'))return r.fulfill({body:fs.readFileSync(R+'aerial.json'),contentType:'application/json'});
     if(u.startsWith('https://x.test/data.json'))return dataFail?r.fulfill({status:500,body:''}):r.fulfill({body:fs.readFileSync(R+'data.json'),contentType:'application/json'});
     if(u.match(/x\.test\/icon/))return r.fulfill({body:fs.readFileSync(R+u.split('/').pop().split('?')[0]),contentType:'image/png'});
     if(u.startsWith('https://x.test/manifest'))return r.fulfill({body:fs.readFileSync(R+'manifest.webmanifest'),contentType:'application/manifest+json'});
@@ -58,6 +59,9 @@ const log=(...a)=>console.log(...a);
   const lbx=await pg.evaluate(()=>({open:!$('#lb').hidden,idx:LB&&LB.idx}));
   check(lbx.open&&lbx.idx===3,`[${w}] tapping an album thumbnail opens that photo full screen`);
   await pg.click('#lbclose');await pg.waitForTimeout(200);check(await pg.evaluate(()=>$('#lb').hidden&&!$('#sheet').hidden),`[${w}] closing the big photo returns to the project`);
+  await pg.waitForSelector('.aerial .aslide',{timeout:5000}).catch(()=>{});
+  const ae=await pg.evaluate(()=>{const s=$('.aerial .aslide');return s?{v:s.value,d:$('.aerial .adate').textContent}:null});
+  check(ae&&ae.v==='0'&&/2012/.test(ae.d),`[${w}] satellite timeline opens on the oldest photo (${ae&&ae.d})`);
   // watch + back button
   await pg.click('[data-watch-toggle]');await pg.goBack();await pg.waitForTimeout(400);
   const s2=await pg.evaluate(()=>({open:!$('#sheet').hidden,url:location.href}));
