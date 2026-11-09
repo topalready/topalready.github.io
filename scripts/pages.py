@@ -19,6 +19,8 @@ def slug(s):
 def ym(s):
     if not s:
         return None
+    if re.fullmatch(r"\d{4}", s):  # year only (exact month not published): treat as end of that year
+        return datetime.date(int(s), 12, 1)
     y, m = s.split("-")[:2]
     return datetime.date(int(y), int(m), 1)
 
@@ -56,7 +58,7 @@ for kind, name, launch, ecd, delayed in rows:
         done = {"top": f"{h[2]}-12", "how": "HDB's official list of completed blocks"}
     if done:
         T, pct = ym(done["top"]), 100
-        desc = (f"Completed: HDB lists all blocks as done ({T.year})" if "HDB" in done.get("how", "") else f"TOP obtained: reported {fmt(T)}") + (f", key collection from {fmt(ym(done['keys']))}" if done.get("keys") else "") + ". Satellite photos since 2012 and real site photos from people nearby. No ads."
+        desc = (f"Completed: HDB lists all blocks as done ({T.year})" if "HDB" in done.get("how", "") else f"TOP obtained: reported {done['top'] if len(done['top']) == 4 else fmt(T)}") + (f", key collection from {fmt(ym(done['keys']))}" if done.get("keys") else "") + ". Satellite photos since 2012 and real site photos from people nearby. No ads."
     if h and not done and h[0] < h[1]:
         desc = f"{h[0]} of {h[1]} blocks completed, per HDB's official list. Est. completion: {fmt(T)}. Satellite photos since 2012 and real site photos from people nearby. No ads."
     title = f"{name} ({kind}) · {APP}"
