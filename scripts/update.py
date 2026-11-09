@@ -127,6 +127,17 @@ def slugs(n):
     return list(dict.fromkeys(re.sub("-+", "-", x) for x in c))
 
 QM = {"Q1": "03", "Q2": "06", "Q3": "09", "Q4": "12"}
+MON = {m: i for i, m in enumerate(["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"], 1)}
+def parse_top(s):
+    """EdgeProp completion date -> YYYY-MM. Handles 'Q4 2028', 'Dec 2028', '31 Dec 2028', '2028-12-31'."""
+    s = (s or "").strip()
+    m = re.match(r"(Q[1-4])\s*(\d{4})", s, re.I)
+    if m: return f"{m.group(2)}-{QM[m.group(1).upper()]}"
+    m = re.match(r"(\d{4})-(\d{2})", s)
+    if m: return f"{m.group(1)}-{m.group(2)}"
+    m = re.search(r"\b([A-Za-z]{3})[a-z]*\.?\s+(\d{4})\b", s)
+    if m and m.group(1).lower() in MON: return f"{m.group(2)}-{MON[m.group(1).lower()]:02d}"
+    return ""
 def mnum(s): return int(s[:4]) * 12 + int(s[5:7])
 condo, seen = [], set()
 for n in cand:
@@ -154,12 +165,17 @@ for n in cand:
     if not got:
         if n in old_condo: condo.append(old_condo[n])
         continue
-    m = re.match(r"(Q[1-4])\s*(\d{4})", got[0])
-    top = f"{m.group(2)}-{QM[m.group(1)]}" if m else ""
+    top = parse_top(got[0])
     launch = got[1] if re.match(r"\d{4}-\d{2}", got[1]) else ""
-    if not top or top < "2026-01":
+    if not top:  # date format we can't read: keep what we had rather than drop the project
+        print("condo: unreadable completion date", repr(got[0]), "for", n)
+        if n in old_condo: condo.append(old_condo[n])
+        continue
+    if top < "2026-01":
+        print("condo: dropped (completed before 2026)", n, top)
         continue
     if launch and mnum(top) - mnum(launch) < 18:
+        print("condo: dropped (launch to TOP under 18 months)", n, launch, top)
         continue
     addr = html.unescape(got[2].encode().decode("unicode_escape", "ignore") if "\\u" in got[2] else got[2]).strip()
     prev = old_condo.get(n)
