@@ -124,5 +124,8 @@
     "how": "expected TOP Nov 2029 (vacant possession 30 Nov 2029 per propertynet.sg); the Q1 2027 date was a placeholder",
     "src": "https://www.newlaunchesreview.com/sophia-meadows/",
     "checked": "2026-10-18"
-  }
+  },
+  "Condo:Grand Dunman": {"top": "2026", "how": "Stacked Homes (2 Sep 2026) reports owners already collected their keys, about two months ahead of schedule, and BCA named it a pilot project for faster TOP inspections; many rental listings ready to move in from Sep 2026. Exact TOP month not published", "src": "https://stackedhomes.com/new-condo-owners-get-their-keys-2-months-earlier-new-process-saving-thousands-rent/", "checked": "2026-11-09"},
+  "Condo:Lumina Grand": {"top": "2026-04", "how": "developer CDL's construction page (\"Obtained in April 2026\") and EdgeProp (13 Aug 2026)", "src": "https://www.cdlhomes.com.sg/construction/amp/", "checked": "2026-11-09"},
+  "Condo:Altura": {"top": "2026-02", "how": "HDB's list of EC Temporary Occupation Permits (TOP 3 Feb 2026)", "src": "https://www.hdb.gov.sg/cs/infoweb/-/media/doc/EAPG-CSC/List-of-EC-Temporary-Occupation-Permit_11_Feb_2026.pdf", "checked": "2026-11-09"}
 }
