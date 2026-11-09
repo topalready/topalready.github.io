@@ -138,6 +138,13 @@ def parse_top(s):
     m = re.search(r"\b([A-Za-z]{3})[a-z]*\.?\s+(\d{4})\b", s)
     if m and m.group(1).lower() in MON: return f"{m.group(2)}-{MON[m.group(1).lower()]:02d}"
     return ""
+def keep_old(n):
+    """Keep yesterday's row for a project we couldn't refresh; fill in a map point if it has none."""
+    r = list(old_condo[n])
+    if len(r) > 4 and not r[4]:
+        r[4] = point(n, r[3])
+    print("condo: kept previous row for", n, "(map point", r[4], ")")
+    condo.append(r)
 def mnum(s): return int(s[:4]) * 12 + int(s[5:7])
 condo, seen = [], set()
 for n in cand:
@@ -163,13 +170,13 @@ for n in cand:
             break
         time.sleep(0.3)
     if not got:
-        if n in old_condo: condo.append(old_condo[n])
+        if n in old_condo: keep_old(n)
         continue
     top = parse_top(got[0])
     launch = got[1] if re.match(r"\d{4}-\d{2}", got[1]) else ""
     if not top:  # date format we can't read: keep what we had rather than drop the project
         print("condo: unreadable completion date", repr(got[0]), "for", n)
-        if n in old_condo: condo.append(old_condo[n])
+        if n in old_condo: keep_old(n)
         continue
     if top < "2026-01":
         print("condo: dropped (completed before 2026)", n, top)
