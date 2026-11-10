@@ -19,7 +19,7 @@ from PIL import Image
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "space_out")
 HALF = 400        # metres shown each side of the site
-LOOKBACK = 800    # days to search back for a clear pass
+LOOKBACK = 400    # days to search back for a clear pass
 CLOUD_MAX = 0.01  # at most this share of the crop may look like cloud (white roofs count a little)
 STAC = "https://earth-search.aws.element84.com/v1/search"
 SG = [103.59, 1.20, 104.05, 1.48]
@@ -88,7 +88,7 @@ def main():
     today = datetime.date.today()
     feats = scenes((today - datetime.timedelta(days=LOOKBACK)).isoformat(), today.isoformat())
     print(len(sites), "sites,", len(feats), "satellite passes to try")
-    done, todo = {}, dict(sites)
+    done, todo, spare = {}, dict(sites), {}
     for f in feats:
         if not todo:
             break
@@ -111,6 +111,12 @@ def main():
                             continue
                         cl = cloudy(refl(bb, ll[0], ll[1], HALF + 100), refl(rr, ll[0], ll[1], HALF + 100))
                         if cl > CLOUD_MAX:
+                            # A site beside big white roofs never gets under the limit. Keep its newest
+                            # near-miss as a spare, used only if no pass in the whole period is accepted.
+                            if cl <= 0.06 and k not in spare:
+                                rgb = window(vis, ll[0], ll[1], HALF)
+                                if clear(m, rgb):
+                                    spare[k] = (day, cl, np.moveaxis(rgb, 0, -1).copy())
                             continue
                         hz = hazy(refl(bb, ll[0], ll[1], HALF + 400), refl(rr, ll[0], ll[1], HALF + 400))
                         rgb = window(vis, ll[0], ll[1], HALF)
@@ -124,6 +130,12 @@ def main():
                 print(day, f["id"], "clear for", got, "of", len(inside), "| still waiting:", len(todo))
         except Exception as ex:
             print("pass failed", f.get("id"), ex)
+    for k, (day, cl, img) in spare.items():
+        if k in todo:
+            name = k.replace(",", "_") + ".jpg"
+            Image.fromarray(img).resize((480, 480), Image.LANCZOS).save(OUT / name, "JPEG", quality=86)
+            done[k] = {"d": day, "f": name, "c": round(cl, 4), "spare": True}; del todo[k]
+            print("used a near-miss picture for", k, day, "cloud score", round(cl, 4))
     if len(done) < 0.5 * len(sites):
         sys.exit(f"only {len(done)} of {len(sites)} sites got a picture; not publishing")
     json.dump({"checked": today.isoformat(), "sites": done}, open(OUT / "index.json", "w"), separators=(",", ":"))
