@@ -1,8 +1,9 @@
 """Take real screenshots of the live app for Instagram posts.
 
 Runs in GitHub Actions (.github/workflows/screens.yml), because the map and
-satellite imagery need open internet. For each project slug it saves, under
-social/screens/<tag>/<slug>/:
+satellite imagery need open internet. The workflow puts the results on the
+"screens" branch (not main, so the published site stays small). For each
+project slug it saves, under <tag>/<slug>/:
   sheet.png    the project sheet as it opens on a phone
   aerial.png   the same sheet scrolled to the "From above" satellite timeline
   sat_<i>.png  each satellite photo on its own (the square viewer only)

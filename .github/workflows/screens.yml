@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Folder name under social/screens/ (e.g. 2026-11-11)"
+        description: "Folder name for this batch (e.g. 2026-11-11)"
         required: true
       projects:
         description: "Project slugs, comma-separated (as in /p/<slug>/)"
@@ -27,15 +27,15 @@ jobs:
           TAG: ${{ github.event.inputs.tag }}
           PROJECTS: ${{ github.event.inputs.projects }}
         run: python scripts/posts/screens.py "$TAG" "$PROJECTS"
-      - name: Save screenshots
+      - name: Save screenshots to the "screens" branch
+        # Kept off main on purpose: screenshots are big, and main is what gets published as the site.
+        env:
+          TAG: ${{ github.event.inputs.tag }}
         run: |
+          mkdir /tmp/out && mv "social/screens/$TAG" /tmp/out/
+          cd /tmp/out
+          git init --quiet -b screens
           git config user.name "storeys-bot"
           git config user.email "storeys-bot@users.noreply.github.com"
-          git add social/screens
-          git diff --cached --quiet && exit 0
-          git commit --quiet -m "Site screenshots for posts [data]"
-          for i in 1 2 3 4 5; do
-            git pull --rebase --quiet && git push --quiet && exit 0
-            sleep 10
-          done
-          exit 1
+          git add . && git commit --quiet -m "Site screenshots for posts ($TAG)"
+          git push --quiet --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" screens

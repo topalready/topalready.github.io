@@ -57,7 +57,8 @@ EXTRA="""
 CSS+=BUB.replace('{{','{').replace('}}','}')+EXTRA
 import io, json
 from PIL import Image as _I
-SHOTS=pathlib.Path(__file__).resolve().parent.parent.parent/'social'/'screens'/'2026-11-11'
+import os
+SHOTS=pathlib.Path(os.environ.get('SHOTS','/home/claude/shots'))/'2026-11-11'  # from the repo's "screens" branch
 def img(rel,w=1100):
     im=_I.open(SHOTS/rel).convert('RGB');im.thumbnail((w,w*3));b=io.BytesIO();im.save(b,'JPEG',quality=90)
     return 'data:image/jpeg;base64,'+base64.b64encode(b.getvalue()).decode()
