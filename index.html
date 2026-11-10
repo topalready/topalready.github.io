@@ -657,7 +657,9 @@ const srcName=p=>p.kind==="BTO"?"HDB's estimate":"the developer's estimate";
 let DATAINFO={updated:"",checked:{}};
 function verdict(p,k){
   if(k.done){const o=p.done;
-    if(o.hdb)return{cls:"ahead",t:"Completed",d:`HDB's official building list shows all ${o.nb} blocks completed (latest in ${o.top}). Key collection usually starts soon after. The estimate we had was ${fmtYM(k.est||k.E)}.`};
+    const est=k.est||k.E,em=est?Math.round(months(k.T,est)):0,early=em>=1,yrs=k.yearOnly?Math.floor(em/12):Math.round(em/6)/2,gap=k.yearOnly?(yrs>=1?`about ${yrs} year${yrs>1?"s":""} `:""):em>=24?`about ${yrs} years `:`about ${em} month${em>1?"s":""} `,who=p.kind==="BTO"?"HDB's":"the developer's";
+    if(o.hdb)return{cls:"ahead",t:early?"Early completion":"Completed",d:`HDB's official building list shows all ${o.nb} blocks completed (latest in ${o.top})${early?`, ${gap}ahead of the ${fmtYM(est)} estimate we had`:""}. Key collection usually starts soon after.${early?"":` The estimate we had was ${fmtYM(est)}.`}`};
+    if(early)return{cls:"ahead",t:"Early completion",d:`TOP reported in ${topWhen(k)}${o.keys?`, with key collection from ${fmtYM(ym(o.keys))}`:""}. That is ${gap}ahead of the ${fmtYM(est)} date on ${who} listing, which is usually the latest date allowed. Based on ${o.how||"reports"}.`};
     return{cls:"ahead",t:"TOP obtained",d:`TOP reported in ${topWhen(k)}${o.keys?`, with key collection from ${fmtYM(ym(o.keys))}`:""}. Based on ${o.how||"reports"}. ${p.kind==="BTO"?"HDB's":"The developer's"} listing showed ${fmtYM(k.est||k.E)}, which is often the latest allowed date.`}}
   if(k.part)return{cls:"ahead",t:`${k.part.n} of ${k.part.of} blocks completed`,d:`HDB's official building list shows ${k.part.n} of this project's ${k.part.of} blocks completed (latest in ${k.part.yr}). The rest should follow, and key collection usually starts soon after a block is done. Estimated completion for the whole project: ${fmtYM(k.T)}.`};
   if(k.pct==null)return{cls:"",t:"Not launched yet",d:`${dateLabel(p)} ${fmtYM(k.T)}. The timeline starts once it launches.`};

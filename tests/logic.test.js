@@ -66,7 +66,14 @@ t("only a verified override marks a project complete", () => {
   const p = { ...bto(ymOff(-30), ymOff(18)), kind: "Condo", done: { top: ymOff(-1), keys: ymOff(0), how: "owners" } };
   const k = stats(p), v = verdict(p, k);
   assert.ok(k.done && k.pct === 100);
-  assert.match(v.t, /TOP obtained/);
+  assert.match(v.t, /Early completion/);
   assert.match(v.d, /owners/);
+  assert.match(v.d, /about 19 months ahead/);
+  const q = { ...bto(ymOff(-30), ymOff(-1)), kind: "Condo", done: { top: ymOff(-1), how: "owners" } };
+  assert.match(verdict(q, stats(q)).t, /TOP obtained/);
+  const y = { ...bto(ymOff(-40), "2028-12"), kind: "Condo", done: { top: "2026", how: "a report" } };
+  const vy = verdict(y, stats(y));
+  assert.match(vy.t, /Early completion/);
+  assert.match(vy.d, /TOP reported in 2026\. That is about 2 years ahead of the Dec 2028 date/);
 });
 console.log(`\n${n} checks passed`);
