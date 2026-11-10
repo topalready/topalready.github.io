@@ -18,7 +18,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "space_out")
 HALF = 400        # metres shown each side of the site
 LOOKBACK = 400    # days to search back for a clear pass
-CLOUD_MAX = 0.03  # at most this share of the crop may look like cloud (white roofs count a little)
+CLOUD_MAX = 0.01  # at most this share of the crop may look like cloud (white roofs count a little)
 STAC = "https://earth-search.aws.element84.com/v1/search"
 SG = [103.59, 1.20, 104.05, 1.48]
 BAD = [0, 1, 3, 8, 9, 10]  # no data, saturated, cloud shadow, cloud (medium/high), cirrus
@@ -49,6 +49,11 @@ def refl(ds, lat, lng, half):
     if sc == 1:  # no scale in the file: Sentinel-2 L2A stores reflectance x 10000 (minus 1000 since 2022)
         sc, off = 0.0001, -0.1
     return dn * sc + off
+
+
+def hazy(blue, red):
+    """Share of a wider area that looks like thin cloud."""
+    return float((((blue - 0.5 * red) > 0.08) & (blue > 0.15)).mean())
 
 
 def cloudy(blue, red):
@@ -101,12 +106,13 @@ def main():
                         cl = cloudy(refl(bb, ll[0], ll[1], HALF + 100), refl(rr, ll[0], ll[1], HALF + 100))
                         if cl > CLOUD_MAX:
                             continue
+                        hz = hazy(refl(bb, ll[0], ll[1], HALF + 400), refl(rr, ll[0], ll[1], HALF + 400))
                         rgb = window(vis, ll[0], ll[1], HALF)
                         if not clear(m, rgb):
                             continue
                         name = k.replace(",", "_") + ".jpg"
                         Image.fromarray(np.moveaxis(rgb, 0, -1)).resize((480, 480), Image.LANCZOS).save(OUT / name, "JPEG", quality=86)
-                        done[k] = {"d": day, "f": name, "c": round(cl, 4)}; del todo[k]; got += 1
+                        done[k] = {"d": day, "f": name, "c": round(cl, 4), "w": round(hz, 4)}; del todo[k]; got += 1
                     except Exception as ex:
                         print("  site failed", k, ex)
                 print(day, f["id"], "clear for", got, "of", len(inside), "| still waiting:", len(todo))
