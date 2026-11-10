@@ -31,6 +31,11 @@ jobs:
         run: |
           git config user.name "storeys-bot"
           git config user.email "storeys-bot@users.noreply.github.com"
-          git pull --rebase --quiet || true
           git add social/screens
-          git diff --cached --quiet || (git commit -m "Site screenshots for posts [data]" && git push)
+          git diff --cached --quiet && exit 0
+          git commit --quiet -m "Site screenshots for posts [data]"
+          for i in 1 2 3 4 5; do
+            git pull --rebase --quiet && git push --quiet && exit 0
+            sleep 10
+          done
+          exit 1
