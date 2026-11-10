@@ -18,10 +18,10 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "space_out")
 HALF = 400        # metres shown each side of the site
 LOOKBACK = 400    # days to search back for a clear pass
+CLOUD_MAX = 0.03  # at most this share of the crop may look like cloud (white roofs count a little)
 STAC = "https://earth-search.aws.element84.com/v1/search"
 SG = [103.59, 1.20, 104.05, 1.48]
-BAD = [0, 1, 3, 7, 8, 9, 10]  # no data, saturated, cloud shadow, unclassified (often cloud edges), cloud, cirrus
-WIDE = 1200       # metres each side that must be free of cloud (small clouds are easy to miss up close)
+BAD = [0, 1, 3, 8, 9, 10]  # no data, saturated, cloud shadow, cloud (medium/high), cirrus
 
 
 def scenes(start, end):
@@ -42,8 +42,23 @@ def window(ds, lat, lng, half):
     return ds.read(window=from_bounds(x[0] - half, y[0] - half, x[0] + half, y[0] + half, ds.transform), boundless=True, fill_value=0)
 
 
+def refl(ds, lat, lng, half):
+    """Surface reflectance (0..1) around the site from one colour band."""
+    dn = window(ds, lat, lng, half)[0].astype("float32")
+    sc, off = (ds.scales[0] or 1), (ds.offsets[0] or 0)
+    if sc == 1:  # no scale in the file: Sentinel-2 L2A stores reflectance x 10000 (minus 1000 since 2022)
+        sc, off = 0.0001, -0.1
+    return dn * sc + off
+
+
+def cloudy(blue, red):
+    """Share of the crop that looks like cloud or haze. Cloud is bright in blue; sand, soil and concrete are redder than they are blue."""
+    hot = blue - 0.5 * red
+    return float(((hot > 0.11) & (blue > 0.2)).mean())
+
+
 def clear(scl, rgb):
-    if scl.size == 0 or rgb.size == 0:
+    if scl.size == 0 or rgb.size == 0 or np.isin(scl, BAD).mean() > 0.02:
         return False
     if (rgb.max(axis=0) == 0).mean() > 0.01:      # edge of the satellite's swath
         return False
@@ -74,19 +89,24 @@ def main():
         if not inside:
             continue
         try:
-            with rasterio.open(f["assets"]["scl"]["href"]) as scl, rasterio.open(f["assets"]["visual"]["href"]) as vis:
+            A = f["assets"]
+            with rasterio.open(A["scl"]["href"]) as scl, rasterio.open(A["visual"]["href"]) as vis, \
+                    rasterio.open(A["blue"]["href"]) as bb, rasterio.open(A["red"]["href"]) as rr:
                 got = 0
                 for k, ll in inside.items():
                     try:
-                        m = window(scl, ll[0], ll[1], WIDE)[0]
-                        if np.isin(m, BAD).mean() > 0.01:
+                        m = window(scl, ll[0], ll[1], HALF + 200)[0]
+                        if np.isin(m, BAD).mean() > 0.02:
+                            continue
+                        cl = cloudy(refl(bb, ll[0], ll[1], HALF + 100), refl(rr, ll[0], ll[1], HALF + 100))
+                        if cl > CLOUD_MAX:
                             continue
                         rgb = window(vis, ll[0], ll[1], HALF)
                         if not clear(m, rgb):
                             continue
                         name = k.replace(",", "_") + ".jpg"
                         Image.fromarray(np.moveaxis(rgb, 0, -1)).resize((480, 480), Image.LANCZOS).save(OUT / name, "JPEG", quality=86)
-                        done[k] = {"d": day, "f": name}; del todo[k]; got += 1
+                        done[k] = {"d": day, "f": name, "c": round(cl, 4)}; del todo[k]; got += 1
                     except Exception as ex:
                         print("  site failed", k, ex)
                 print(day, f["id"], "clear for", got, "of", len(inside), "| still waiting:", len(todo))
