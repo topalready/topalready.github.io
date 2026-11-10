@@ -1,0 +1,37 @@
+name: Latest from space
+on:
+  schedule:
+    - cron: "30 20 * * 0,3"   # Monday and Thursday, 4:30am Singapore time
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+jobs:
+  space:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet rasterio numpy pillow
+      - name: Find the newest clear satellite picture of every site
+        env:
+          AWS_NO_SIGN_REQUEST: "YES"
+          GDAL_DISABLE_READDIR_ON_OPEN: "EMPTY_DIR"
+          GDAL_HTTP_MAX_RETRY: "3"
+        run: python scripts/space.py /tmp/space
+      - name: Save to the "space" branch
+        # Kept off main so the pictures don't pile up in the history; update.yml copies them into the site.
+        run: |
+          cd /tmp/space
+          git init --quiet -b space
+          git config user.name "storeys-bot"
+          git config user.email "storeys-bot@users.noreply.github.com"
+          git add . && git commit --quiet -m "Latest from space"
+          git push --quiet --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" space
+      - name: Publish the site with the new pictures
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run update.yml --ref main

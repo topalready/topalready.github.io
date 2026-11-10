@@ -97,6 +97,7 @@ input:focus-visible,button:focus-visible,a:focus-visible,label:focus-within{outl
 .fixline{margin:12px 0 0;font-size:.85rem;color:var(--muted);text-align:center}.fixline a{color:var(--ink);font-weight:600}
 .avid{display:block;width:100%;margin:10px 0 0}
 .acredit{font-size:.72rem;color:var(--muted);margin:6px 0 0}.acredit a{color:inherit}
+.space{margin:14px 0 4px}.space h4{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:1.05rem;margin:0 0 2px}.space .aview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:auto}
 @media (prefers-reduced-motion:reduce){.aframe{transition:none}}
 .album{margin:6px 0 4px}
 .month{margin:0 0 6px}
@@ -505,7 +506,7 @@ html[data-ph=night] .bldg.seen .lbl{background:#6B5A2A}
   <h2 class="sect">Worth a look</h2>
   <section id="explore" aria-label="Project shelves"></section>
   <div id="tipslot"></div>
-  <p class="src">BTO dates and announced delays: BTO HQ TOP tracker. BTO blocks and postal codes: OneMap. Condo launch and expected TOP: EdgeProp developer listings. Map: OpenFreeMap, OpenMapTiles and OpenStreetMap contributors. Site photos: uploaded by people within 800 m of the site. Data refreshed automatically every day, last at <span id="upd">…</span>. <a href="privacy.html">Privacy, terms and how the numbers work</a>. Spotted a wrong date or missing project? <a href="mailto:topalready.sg@gmail.com">topalready.sg@gmail.com</a></p>
+  <p class="src">BTO dates and announced delays: BTO HQ TOP tracker. BTO blocks and postal codes: OneMap. Condo launch and expected TOP: EdgeProp developer listings. Map: OpenFreeMap, OpenMapTiles and OpenStreetMap contributors. Latest from space: contains modified Copernicus Sentinel data (Sentinel-2, European Space Agency). Site photos: uploaded by people within 800 m of the site. Data refreshed automatically every day, last at <span id="upd">…</span>. <a href="privacy.html">Privacy, terms and how the numbers work</a>. Spotted a wrong date or missing project? <a href="mailto:topalready.sg@gmail.com">topalready.sg@gmail.com</a></p>
 </div></section>
 
 <nav id="tabs" role="tablist" aria-label="Sections">
@@ -834,7 +835,7 @@ function card(p){
     <p class="explain">${k.part?`From <a href="${HDBSRC}" target="_blank" rel="noopener">HDB's official list of completed blocks</a>, checked daily.`:k.done?`Marked complete from ${esc(p.done.how||"reports")}${p.done.src?` (<a href="${esc(p.done.src)}" target="_blank" rel="noopener">source</a>)`:""}.`:`Time since launch, as a share of the time to ${srcName(p)} of completion. It doesn't measure work on site.`}</p>
     <div class="built" data-built="${esc(p.key)}">${builtHTML(p)}</div>
     <div class="verdict ${v.cls}"><b>${esc(v.t)}</b>${esc(v.d)}</div>
-    ${p.ll?`<div class="aerial" data-aerial="${esc(p.key)}"><h3>From above</h3><p class="note">Satellite photos of this exact spot over the years. Drag back to see it before construction.</p><div class="abody"><p class="note">Loading satellite photos…</p></div></div>`:""}
+    ${p.ll?`<div class="aerial" data-aerial="${esc(p.key)}"><h3>From above</h3><p class="note">Satellite photos of this exact spot over the years. Drag back to see it before construction.</p><div class="abody"><p class="note">Loading satellite photos…</p></div><div class="space" hidden></div></div>`:""}
     <div class="facts">
       <div>Launched<b>${fmtYM(k.L)}</b></div>
       <div>${k.done?(p.done.hdb?"Completed":"TOP obtained"):dateLabel(p)}<b>${k.done?topWhen(k):fmtYM(k.T)}</b></div>
@@ -988,6 +989,18 @@ $("#cheer").addEventListener("click",e=>{if(e.target.id==="cheer")$("#cheer").hi
 let AERIAL=null,APLAY=null;
 const WB="https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery/WMTS/1.0.0/default028mm/MapServer/tile/";
 const WBAPP=ll=>`https://livingatlas.arcgis.com/wayback/#mapCenter=${ll[1].toFixed(5)}%2C${ll[0].toFixed(5)}%2C17&mode=explore`;
+let SPACE=null;
+/* "Latest from space": newest clear Sentinel-2 picture of the site (10 m per pixel, refreshed twice a week by scripts/space.py) */
+async function loadSpace(p){
+  if(!p.ll)return;
+  if(!SPACE){try{const r=await fetch("space/index.json",{cache:"no-cache"});SPACE=r.ok?await r.json():{sites:{}}}catch(e){SPACE={sites:{}}}}
+  const box=[...document.querySelectorAll(".aerial")].find(b=>b.dataset.aerial===p.key),el=box&&box.querySelector(".space");if(!el)return;
+  const s=(SPACE.sites||{})[p.ll[0].toFixed(4)+","+p.ll[1].toFixed(4)];if(!s)return;
+  const d=new Date(s.d+"T12:00:00+08:00"),days=Math.max(0,Math.round((Date.now()-d)/864e5));
+  const when=d.toLocaleDateString("en-SG",{day:"numeric",month:"short",year:"numeric"});
+  el.innerHTML=`<h4>Latest from space</h4><p class="note">The newest clear picture of this spot. It is blurrier than the photos above (each dot is about 10 m), but much more recent: good for seeing land being cleared and blocks going up, not details.</p><div class="aview" role="img" aria-label="Satellite picture of the site taken ${esc(when)}"><img alt="" loading="lazy" src="space/${esc(s.f)}?${esc(s.d)}"><span class="apin" aria-hidden="true"></span><div class="acap"><b>${esc(when)}</b><span>${days<1?"Today":days===1?"Yesterday":days<60?days+" days ago":Math.round(days/30.44)+" months ago"}</span></div></div><p class="acredit">Contains modified Copernicus Sentinel data ${d.getFullYear()} (Sentinel-2, European Space Agency). A new picture appears when the satellite gets a cloud-free view, so some sites wait longer.</p>`;
+  el.hidden=false;
+}
 async function loadAerial(p,photosReady){
   if(!p.ll)return;
   try{await photosReady}catch(e){}
@@ -1167,7 +1180,7 @@ async function uploadFile(key,file){
     say("Photo added to the album. Thanks for keeping this site up to date.","ok");
     const prev=STATUS[key];STATUS[key]={...(prev||{}),last:new Date(taken),photos30:((prev&&prev.photos30)||0)+1,...(sc.storeys!=null?{storeys:sc.storeys,at:new Date(taken)}:{}),...(sc.total?{total:(prev&&prev.total)||sc.total}:{})};
     refreshStatusUI();
-    await loadPhotos(key);loadAerial(p);
+    await loadPhotos(key);loadAerial(p);loadSpace(p);
     added(p,taken,wasNew);
   }catch(e){
     say("The upload didn't go through. Check your connection and try again.","err");
@@ -1389,7 +1402,7 @@ function sheetShown(url){
 function openSheet(i){
   const p=P[i];if(!p)return;SHEETKEY=p.key;
   hideWelcome();track("open",p.key);
-  $("#sheetbody").innerHTML=card(p);sheetShown("?p="+slug(p.name));loadAerial(p,loadPhotos(p.key));
+  $("#sheetbody").innerHTML=card(p);sheetShown("?p="+slug(p.name));loadAerial(p,loadPhotos(p.key));loadSpace(p);
 }
 function closeSheet(fromBack){
   if(APLAY){clearInterval(APLAY);APLAY=null}

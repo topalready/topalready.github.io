@@ -47,6 +47,10 @@ jobs:
         run: |
           pip install --quiet pillow
           python scripts/pages.py
+      - name: Add the "Latest from space" pictures
+        run: |
+          mkdir -p space
+          git fetch --quiet --depth 1 origin space && git archive FETCH_HEAD | tar -x -C space || echo "no space pictures yet"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
