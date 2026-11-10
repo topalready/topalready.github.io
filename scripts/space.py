@@ -5,7 +5,9 @@ than the dated Esri photos in aerial.json, but far newer. For each site we take 
 newest pass where the site is free of cloud, shadow and haze, crop 800 m around it
 and save a small JPEG plus index.json into the folder given as argv[1]. The data is
 free and open (Copernicus Sentinel data, read from the public AWS copy via the
-Earth Search catalogue). Run by .github/workflows/space.yml, which publishes the
+Earth Search catalogue). The automatic cloud checks miss the odd thin cloud, so
+space_skip.json lists passes to skip for a site after someone has looked at the
+picture and found it cloudy: add the site's "lat,lng" and the date there. Run by .github/workflows/space.yml, which publishes the
 folder on the "space" branch; update.yml copies it into the site as /space/.
 """
 import datetime, json, os, pathlib, sys, urllib.request
@@ -78,6 +80,10 @@ def main():
         ll = row[-1]
         if isinstance(ll, list) and len(ll) == 2:
             sites[f"{ll[0]:.4f},{ll[1]:.4f}"] = ll
+    try:
+        skip = json.load(open(ROOT / "space_skip.json"))
+    except Exception:
+        skip = {}
     OUT.mkdir(parents=True, exist_ok=True)
     today = datetime.date.today()
     feats = scenes((today - datetime.timedelta(days=LOOKBACK)).isoformat(), today.isoformat())
@@ -90,7 +96,7 @@ def main():
         if f["properties"].get("eo:cloud_cover", 0) > 90:
             continue
         w, s, e, n = f["bbox"]
-        inside = {k: ll for k, ll in todo.items() if s <= ll[0] <= n and w <= ll[1] <= e}
+        inside = {k: ll for k, ll in todo.items() if s <= ll[0] <= n and w <= ll[1] <= e and day not in skip.get(k, [])}
         if not inside:
             continue
         try:
