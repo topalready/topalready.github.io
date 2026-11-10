@@ -1,0 +1,36 @@
+name: Screenshot the app for posts
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Folder name under social/screens/ (e.g. 2026-11-11)"
+        required: true
+      projects:
+        description: "Project slugs, comma-separated (as in /p/<slug>/)"
+        required: true
+permissions:
+  contents: write
+jobs:
+  shoot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install browser
+        run: |
+          pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+      - name: Take screenshots
+        env:
+          TAG: ${{ github.event.inputs.tag }}
+          PROJECTS: ${{ github.event.inputs.projects }}
+        run: python scripts/posts/screens.py "$TAG" "$PROJECTS"
+      - name: Save screenshots
+        run: |
+          git config user.name "storeys-bot"
+          git config user.email "storeys-bot@users.noreply.github.com"
+          git pull --rebase --quiet || true
+          git add social/screens
+          git diff --cached --quiet || (git commit -m "Site screenshots for posts [data]" && git push)
