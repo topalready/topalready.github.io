@@ -19,7 +19,7 @@ from PIL import Image
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "space_out")
 HALF = 400        # metres shown each side of the site
-LOOKBACK = 400    # days to search back for a clear pass
+LOOKBACK = 800    # days to search back for a clear pass
 CLOUD_MAX = 0.01  # at most this share of the crop may look like cloud (white roofs count a little)
 STAC = "https://earth-search.aws.element84.com/v1/search"
 SG = [103.59, 1.20, 104.05, 1.48]
