@@ -63,7 +63,7 @@ def cloudy(blue, red):
 
 
 def clear(scl, rgb):
-    if scl.size == 0 or rgb.size == 0 or np.isin(scl, BAD).mean() > 0.02:
+    if scl.size == 0 or rgb.size == 0:
         return False
     if (rgb.max(axis=0) == 0).mean() > 0.01:      # edge of the satellite's swath
         return False
@@ -101,7 +101,7 @@ def main():
                 for k, ll in inside.items():
                     try:
                         m = window(scl, ll[0], ll[1], HALF + 200)[0]
-                        if np.isin(m, BAD).mean() > 0.02:
+                        if np.isin(m, BAD).mean() > 0.004:
                             continue
                         cl = cloudy(refl(bb, ll[0], ll[1], HALF + 100), refl(rr, ll[0], ll[1], HALF + 100))
                         if cl > CLOUD_MAX:
