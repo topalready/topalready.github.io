@@ -20,7 +20,8 @@ HALF = 400        # metres shown each side of the site
 LOOKBACK = 400    # days to search back for a clear pass
 STAC = "https://earth-search.aws.element84.com/v1/search"
 SG = [103.59, 1.20, 104.05, 1.48]
-BAD = [0, 1, 3, 8, 9, 10]  # no data, saturated, cloud shadow, cloud (medium/high), cirrus
+BAD = [0, 1, 3, 7, 8, 9, 10]  # no data, saturated, cloud shadow, unclassified (often cloud edges), cloud, cirrus
+WIDE = 1200       # metres each side that must be free of cloud (small clouds are easy to miss up close)
 
 
 def scenes(start, end):
@@ -42,7 +43,7 @@ def window(ds, lat, lng, half):
 
 
 def clear(scl, rgb):
-    if scl.size == 0 or rgb.size == 0 or np.isin(scl, BAD).mean() > 0.02:
+    if scl.size == 0 or rgb.size == 0:
         return False
     if (rgb.max(axis=0) == 0).mean() > 0.01:      # edge of the satellite's swath
         return False
@@ -77,8 +78,8 @@ def main():
                 got = 0
                 for k, ll in inside.items():
                     try:
-                        m = window(scl, ll[0], ll[1], HALF + 200)[0]
-                        if np.isin(m, BAD).mean() > 0.02:
+                        m = window(scl, ll[0], ll[1], WIDE)[0]
+                        if np.isin(m, BAD).mean() > 0.01:
                             continue
                         rgb = window(vis, ll[0], ll[1], HALF)
                         if not clear(m, rgb):
