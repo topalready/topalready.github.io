@@ -1,0 +1,72 @@
+{
+ "bayshore-vista": [
+  {
+   "label": "latest",
+   "date": "2026-10-31"
+  },
+  {
+   "label": "year_ago",
+   "date": "2025-10-26"
+  },
+  {
+   "label": "two_years_ago",
+   "date": "2024-11-05"
+  }
+ ],
+ "plantation-edge-i-ii": [
+  {
+   "label": "latest",
+   "date": "2026-10-31"
+  },
+  {
+   "label": "year_ago",
+   "date": "2025-12-05"
+  },
+  {
+   "label": "two_years_ago",
+   "date": "2024-09-01"
+  }
+ ],
+ "grand-dunman": [
+  {
+   "label": "latest",
+   "date": "2026-10-31"
+  },
+  {
+   "label": "year_ago",
+   "date": "2025-10-08"
+  },
+  {
+   "label": "two_years_ago",
+   "date": "2024-11-05"
+  }
+ ],
+ "chencharu-grove": [
+  {
+   "label": "latest",
+   "date": "2026-10-16"
+  },
+  {
+   "label": "year_ago",
+   "date": "2025-09-06"
+  },
+  {
+   "label": "two_years_ago",
+   "date": "2024-07-23"
+  }
+ ],
+ "sembawang-beacon": [
+  {
+   "label": "latest",
+   "date": "2026-10-31"
+  },
+  {
+   "label": "year_ago",
+   "date": "2025-12-05"
+  },
+  {
+   "label": "two_years_ago",
+   "date": "2024-07-18"
+  }
+ ]
+}
