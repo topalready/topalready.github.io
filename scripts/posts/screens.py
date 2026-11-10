@@ -7,6 +7,7 @@ project slug it saves, under <tag>/<slug>/:
   sheet.png    the project sheet as it opens on a phone
   aerial.png   the same sheet scrolled to the "From above" satellite timeline
   sat_<i>.png  each satellite photo on its own (the square viewer only)
+  space.png    the "Latest from space" block (newest Sentinel-2 picture and its date)
   map.png      the map with the sheet closed
   meta.json    project name plus the date shown on each satellite photo
 Usage: python scripts/posts/screens.py <tag> <slug>[,<slug>...]
@@ -52,6 +53,16 @@ async def shoot(cx, slug, out):
         meta["credit"] = (await pg.locator(".aerial .acredit").inner_text()).split(".")[0]
     except Exception as e:
         print("no satellite timeline for", slug, e)
+    try:  # "Latest from space": newest Sentinel-2 picture, with its date
+        sp = pg.locator(".aerial .space:not([hidden])")
+        await sp.wait_for(timeout=8000)
+        await sp.scroll_into_view_if_needed()
+        await pg.wait_for_function("(()=>{const i=document.querySelector('.aerial .space img');return i&&i.complete&&i.naturalWidth>0})()", timeout=15000)
+        await pg.wait_for_timeout(400)
+        await sp.screenshot(path=str(out / "space.png"))
+        meta["space"] = {"file": "space.png", "date": await sp.locator(".acap b").inner_text(), "ago": await sp.locator(".acap span").inner_text()}
+    except Exception as e:
+        print("no latest-from-space picture for", slug, e)
     await pg.keyboard.press("Escape")
     await pg.wait_for_timeout(2500)
     await pg.screenshot(path=str(out / "map.png"))
