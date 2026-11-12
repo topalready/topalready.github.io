@@ -46,11 +46,11 @@ async def shoot(cx, slug, out):
                 await pg.evaluate("document.querySelector('.aerial').scrollIntoView({block:'start'})")
                 await pg.wait_for_timeout(600)
                 await pg.screenshot(path=str(out / "aerial.png"))
-            await pg.locator(".aerial .aview").screenshot(path=str(out / f"sat_{i}.png"))
+            await pg.locator(".aerial .aview").first.screenshot(path=str(out / f"sat_{i}.png"))
             meta["frames"].append({"i": i, "file": f"sat_{i}.png",
                                    "date": await pg.locator(".aerial .adate").inner_text(),
                                    "rel": await pg.locator(".aerial .arel").inner_text()})
-        meta["credit"] = (await pg.locator(".aerial .acredit").inner_text()).split(".")[0]
+        meta["credit"] = (await pg.locator(".aerial .acredit").first.inner_text()).split(".")[0]
     except Exception as e:
         print("no satellite timeline for", slug, e)
     try:  # "Latest from space": newest Sentinel-2 picture, with its date
