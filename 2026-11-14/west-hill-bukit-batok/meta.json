@@ -1,0 +1,48 @@
+{
+ "slug": "west-hill-bukit-batok",
+ "name": "West Hill @ Bukit BatokBTO",
+ "frames": [
+  {
+   "i": 0,
+   "file": "sat_0.png",
+   "date": "Apr 2012",
+   "rel": "9 yrs before launch"
+  },
+  {
+   "i": 1,
+   "file": "sat_1.png",
+   "date": "Mar 2015",
+   "rel": "6 yrs before launch"
+  },
+  {
+   "i": 2,
+   "file": "sat_2.png",
+   "date": "Feb 2018",
+   "rel": "3 yrs before launch"
+  },
+  {
+   "i": 3,
+   "file": "sat_3.png",
+   "date": "Jan 2020",
+   "rel": "1 yr before launch"
+  },
+  {
+   "i": 4,
+   "file": "sat_4.png",
+   "date": "Jan 2022",
+   "rel": "1 yrs after launch"
+  },
+  {
+   "i": 5,
+   "file": "sat_5.png",
+   "date": "Aug 2025",
+   "rel": "4.6 yrs after launch"
+  }
+ ],
+ "credit": "Imagery: Esri, Vantor, Earthstar Geographics, via World Imagery Wayback",
+ "space": {
+  "file": "space.png",
+  "date": "26 Sept 2026",
+  "ago": "49 days ago"
+ }
+}

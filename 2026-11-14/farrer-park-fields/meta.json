@@ -1,0 +1,54 @@
+{
+ "slug": "farrer-park-fields",
+ "name": "Farrer Park FieldsBTO",
+ "frames": [
+  {
+   "i": 0,
+   "file": "sat_0.png",
+   "date": "Jun 2012",
+   "rel": "11 yrs before launch"
+  },
+  {
+   "i": 1,
+   "file": "sat_1.png",
+   "date": "Jan 2015",
+   "rel": "8 yrs before launch"
+  },
+  {
+   "i": 2,
+   "file": "sat_2.png",
+   "date": "May 2016",
+   "rel": "7 yrs before launch"
+  },
+  {
+   "i": 3,
+   "file": "sat_3.png",
+   "date": "Feb 2018",
+   "rel": "5 yrs before launch"
+  },
+  {
+   "i": 4,
+   "file": "sat_4.png",
+   "date": "Jan 2020",
+   "rel": "3 yrs before launch"
+  },
+  {
+   "i": 5,
+   "file": "sat_5.png",
+   "date": "Aug 2022",
+   "rel": "6 months before launch"
+  },
+  {
+   "i": 6,
+   "file": "sat_6.png",
+   "date": "May 2025",
+   "rel": "2.3 yrs after launch"
+  }
+ ],
+ "credit": "Imagery: Esri, Vantor, Earthstar Geographics, via World Imagery Wayback",
+ "space": {
+  "file": "space.png",
+  "date": "31 Oct 2026",
+  "ago": "14 days ago"
+ }
+}
