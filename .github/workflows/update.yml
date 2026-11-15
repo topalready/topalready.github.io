@@ -42,7 +42,17 @@ jobs:
           git config user.name "storeys-bot"
           git config user.email "storeys-bot@users.noreply.github.com"
           git add data.json aerial.json
-          git diff --cached --quiet || git commit -m "Daily data refresh [data]" && git push || true
+          git diff --cached --quiet && exit 0
+          git commit -q -m "Daily data refresh [data]"
+          # If main moved while this ran (e.g. a hand edit or another run), replay the refresh on top of it
+          # instead of silently dropping it. On a clash the newer copy on main wins; the next run refreshes again.
+          for i in 1 2 3; do
+            git push -q && exit 0
+            echo "::warning::main moved during this run; replaying the refresh on top (try $i)"
+            git fetch -q origin main || true
+            git rebase -q -X ours origin/main || { git rebase --abort || true; echo "::warning::could not replay the refresh"; exit 0; }
+          done
+          echo "::warning::refreshed data was not saved to main; the next run will refresh again"
       - name: Build project link pages
         run: |
           pip install --quiet pillow
