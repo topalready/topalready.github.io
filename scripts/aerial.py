@@ -119,9 +119,10 @@ def main():
         res = dict(ex.map(work, sorted(sites)))
     res = {k: v for k, v in res.items() if v}
     out = {"latest": latest, "checked": datetime.date.today().isoformat(), "sites": res}
-    if out["sites"] == old.get("sites") and old.get("latest") == latest:
+    if out["sites"] == old.get("sites") and old.get("latest") == latest and old.get("checked") == out["checked"]:
         print("aerial: no change")
         return
+    # Rewritten even when nothing changed, so "checked" shows the last day Esri's newest release was looked at.
     json.dump(out, open(OUT, "w"), separators=(",", ":"))
     print(f"aerial: {len(res)} sites, {sum(len(v) for v in res.values())} snapshots")
 

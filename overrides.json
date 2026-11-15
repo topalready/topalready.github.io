@@ -90,9 +90,9 @@
     "checked": "2026-10-17"
   },
   "Condo:Arina East Residences": {
-    "launch": "2025-04",
-    "how": "launched Apr 2025",
-    "src": "https://www.edgeprop.sg/property-news/zacd-group-preview-freehold-arina-east-residences-prices-3000-psf",
+    "launch": "2025-06",
+    "how": "public preview 31 May 2025, sales opened 7 Jun 2025 (EdgeProp 7 Jun 2025; 99.co); the earlier April dates did not go ahead",
+    "src": "https://www.edgeprop.sg/property-news/private-placement-arina-east-residences-moves-10-units-average-price-3008-psf",
     "checked": "2026-10-17"
   },
   "Condo:LyndenWoods": {
@@ -127,5 +127,10 @@
   },
   "Condo:Grand Dunman": {"top": "2026", "how": "a Stacked Homes report (2 Sep 2026) that owners had already collected their keys, ahead of the developer's own Sep to Oct 2026 target, and many rental listings marked ready to move in from Sep 2026. The exact TOP month has not been published", "src": "https://stackedhomes.com/new-condo-owners-get-their-keys-2-months-earlier-new-process-saving-thousands-rent/", "checked": "2026-11-09"},
   "Condo:Lumina Grand": {"top": "2026-04", "how": "developer CDL's construction page (\"Obtained in April 2026\") and EdgeProp (13 Aug 2026)", "src": "https://www.cdlhomes.com.sg/construction/amp/", "checked": "2026-11-09"},
-  "Condo:Altura": {"top": "2026-02", "how": "HDB's list of EC Temporary Occupation Permits (TOP 3 Feb 2026)", "src": "https://www.hdb.gov.sg/cs/infoweb/-/media/doc/EAPG-CSC/List-of-EC-Temporary-Occupation-Permit_11_Feb_2026.pdf", "checked": "2026-11-09"}
+  "Condo:Altura": {"top": "2026-02", "how": "HDB's list of EC Temporary Occupation Permits (TOP 3 Feb 2026)", "src": "https://www.hdb.gov.sg/cs/infoweb/-/media/doc/EAPG-CSC/List-of-EC-Temporary-Occupation-Permit_11_Feb_2026.pdf", "checked": "2026-11-09"},
+  "Condo:Nava Grove": {"est": "2028-03", "how": "developer Sinar Mas Land (24 Sep 2026, topping out): expected TOP in the first quarter of 2028; The Edge Singapore says the same", "src": "https://www.sinarmasland.com/news/nava-grove-reaches-topping-out-milestone-with-99-of-homes-sold", "checked": "2026-11-15"},
+  "Condo:Springleaf Residence": {"est": "2029-12", "how": "expected TOP in the second half of 2029 (Stacked Homes; 99.co, which gives 31 Dec 2031 only as the legal vacant-possession date)", "src": "https://stackedhomes.com/springleaf-mega-launch-941-units-from-878k/", "checked": "2026-11-15"},
+  "Condo:Thomson Reserve": {"est": "2030-12", "how": "UOL and CapitaLand news release (15 Oct 2026): previews from 17 Oct, launch 31 Oct 2026, expected TOP 2H 2030", "src": "https://www.capitaland.com/en/about-capitaland/newsroom/news-releases/international/2026/october/cld-unveil-thomson-reserve.html", "checked": "2026-11-15"},
+  "Condo:Lucerne Grand": {"est": "2030-12", "how": "CDL: sales began 3 Oct 2026; Stacked Homes review (18 Sep 2026): expected TOP 2030", "src": "https://stackedhomes.com/lucerne-grand-condo-review/", "checked": "2026-11-15"},
+  "Condo:Amberwood at Holland": {"est": "2030-06", "how": "preview 11 Sep, sales launch 26 Sep 2026; expected TOP June 2030 (Propwise 17 Oct 2026; Stacked Homes 12 Sep 2026 gives 2030)", "src": "https://www.propwise.sg/amberwood-at-holland-new-launch-review/", "checked": "2026-11-15"}
 }
