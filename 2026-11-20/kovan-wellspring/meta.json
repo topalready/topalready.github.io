@@ -1,0 +1,48 @@
+{
+ "slug": "kovan-wellspring",
+ "name": "Kovan WellspringBTO",
+ "frames": [
+  {
+   "i": 0,
+   "file": "sat_0.png",
+   "date": "Jun 2012",
+   "rel": "9 yrs before launch"
+  },
+  {
+   "i": 1,
+   "file": "sat_1.png",
+   "date": "Jan 2015",
+   "rel": "7 yrs before launch"
+  },
+  {
+   "i": 2,
+   "file": "sat_2.png",
+   "date": "Feb 2018",
+   "rel": "4 yrs before launch"
+  },
+  {
+   "i": 3,
+   "file": "sat_3.png",
+   "date": "Oct 2017",
+   "rel": "4 yrs before launch"
+  },
+  {
+   "i": 4,
+   "file": "sat_4.png",
+   "date": "Aug 2022",
+   "rel": "1 yrs after launch"
+  },
+  {
+   "i": 5,
+   "file": "sat_5.png",
+   "date": "Jun 2025",
+   "rel": "3.8 yrs after launch"
+  }
+ ],
+ "credit": "Imagery: Esri, Vantor, Earthstar Geographics, via World Imagery Wayback",
+ "space": {
+  "file": "space.png",
+  "date": "22 Aug 2026",
+  "ago": "3 months ago"
+ }
+}
